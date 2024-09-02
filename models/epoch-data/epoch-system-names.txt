@@ -1,0 +1,21 @@
+Llama 3.1-405B
+Claude 3.5 Sonnet
+GPT-4o
+Llama 3-70B
+Claude 3 Opus
+Gemini 1.5 Pro
+Mixtral 8x7B
+Gemini 1.0 Ultra
+Gemini 1.0 Pro
+Claude 2.1
+GPT-4 Turbo
+Falcon-180B
+Llama 2-70B
+Llama 2-7B
+Claude 2
+GPT-4
+LLaMA-65B
+GPT-3.5 Turbo
+GPT-3.5 (text-davinci-003)
+Galactica
+GPT-3 175B (davinci)

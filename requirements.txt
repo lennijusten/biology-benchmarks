@@ -6,6 +6,7 @@ datasets
 inspect-ai
 openai
 anthropic
+google-generativeai
 google-api-python-client
 tavily-python
 pyyaml
