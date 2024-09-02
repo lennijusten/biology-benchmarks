@@ -1,21 +1,42 @@
+Mistral Large 2
+Mistral Large
+Mistral 8x7B
+Mistral 7B
+Mistral Medium
 Llama 3.1-405B
-Claude 3.5 Sonnet
-GPT-4o
+Llama 3.1-70B
+Llama 3.1-8B
 Llama 3-70B
-Claude 3 Opus
-Gemini 1.5 Pro
-Mixtral 8x7B
-Gemini 1.0 Ultra
-Gemini 1.0 Pro
-Claude 2.1
-GPT-4 Turbo
-Falcon-180B
+Llama 3-8B
 Llama 2-70B
+Llama 2-34B
+Llama 2-13B
 Llama 2-7B
-Claude 2
-GPT-4
 LLaMA-65B
+LLaMA-33B
+Galactica
+Claude 3.5 Sonnet
+Claude 3 Opus
+Claude 3 Sonnet
+Claude 3 Haiku
+Claude 2.1
+Claude 2
+Claude Instant
+Claude
+GPT-4o mini
+GPT-4o
+GPT-4 Turbo
+GPT-4
 GPT-3.5 Turbo
 GPT-3.5 (text-davinci-003)
-Galactica
 GPT-3 175B (davinci)
+Gemini 1.5 Pro
+Gemini Nano-2
+Gemini 1.0 Ultra
+Gemini 1.0 Pro
+Falcon 2 11B
+Falcon-180B
+Grok-1.5
+Grok-1.5V
+Grok-1
+Grok-0
