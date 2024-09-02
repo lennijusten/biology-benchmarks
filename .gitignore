@@ -2,3 +2,6 @@
 .vscode/
 .env
 logs/
+create_code_summary.py
+files_to_include.txt
+benchmarks/__pycache__/

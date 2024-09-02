@@ -1,0 +1,11 @@
+python-dotenv
+ipykernel
+ipywidgets
+pandas
+datasets
+inspect-ai
+openai
+anthropic
+google-api-python-client
+tavily-python
+pyyaml
