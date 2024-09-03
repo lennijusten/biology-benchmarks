@@ -47,6 +47,9 @@ global_settings:
   temperature: 0.7
   max_tokens: 1000
 
+environment:
+  INSPECT_LOG_DIR: ./logs/gpqa-biology
+
 models:
   google/gemini-1.5-pro:
     temperature: 0.8
