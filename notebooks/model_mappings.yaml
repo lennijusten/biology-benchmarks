@@ -16,3 +16,6 @@ model_mappings:
   mistral/mistral-large-latest: "Mistral Large 2"
   mistral/open-mistral-7b: "Mistral 7B"
   mistral/open-mixtral-8x7b: "Mixtral 8x7B"
+  together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: "Llama 3.1-405B"
+  together/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo: "Llama 3.1-70B"
+  meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo: "Llama 3.1-8B"
