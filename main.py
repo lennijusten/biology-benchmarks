@@ -47,11 +47,8 @@ def run_benchmarks(config):
         results[epoch_model_name] = eval_result
 
     # Analyze results (implement your analysis logic here)
-    analyze_results(results)
+    # analyze_results(results)
 
-def analyze_results(logs):
-    # Implement your analysis logic here
-    pass
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run biology LLM benchmarks")

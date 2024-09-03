@@ -10,3 +10,4 @@ google-generativeai
 google-api-python-client
 tavily-python
 pyyaml
+matplotlib
