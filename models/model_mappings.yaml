@@ -13,4 +13,6 @@ model_mappings:
   anthropic/claude-2.1: "Claude 2.1"
   anthropic/claude-2.0: "Claude 2"
   anthropic/claude-instant-1.2: "Claude Instant"
-  
+  mistral/mistral-large-latest: "Mistral Large 2"
+  mistral/open-mistral-7b: "Mistral 7B"
+  mistral/open-mixtral-8x7b: "Mixtral 8x7B"

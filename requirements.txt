@@ -8,6 +8,7 @@ openai
 anthropic
 google-generativeai
 google-api-python-client
+mistralai
 tavily-python
 pyyaml
 matplotlib

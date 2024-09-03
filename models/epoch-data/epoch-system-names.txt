@@ -1,6 +1,6 @@
 Mistral Large 2
 Mistral Large
-Mistral 8x7B
+Mixtral 8x7B
 Mistral 7B
 Mistral Medium
 Llama 3.1-405B
