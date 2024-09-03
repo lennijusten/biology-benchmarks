@@ -15,6 +15,7 @@ class GPQABenchmark(Benchmark):
     possible_args = {
         "dataset": ["gpqa_diamond", "gpqa_experts", "gpqa_extended", "gpqa_main"],
         "domain": ["Biology", "Chemistry", "Physics"],
+        "samples": int
     }
 
     @classmethod
