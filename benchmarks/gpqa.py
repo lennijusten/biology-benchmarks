@@ -19,12 +19,15 @@ class GPQABenchmark(Benchmark):
 
     @classmethod
     @task(category="biology")
-    def run(cls, dataset="gpqa_main", domain="Biology", **kwargs) -> Task:
+    def run(cls, dataset="gpqa_main", domain="Biology", samples=None, **kwargs) -> Task:
         validated_args = cls.validate_args({"dataset": dataset, "domain": domain})
         
         ds = load_dataset("Idavidrein/gpqa", validated_args["dataset"])
         df = ds['train'].to_pandas()
         df_filtered = df[df["High-level domain"] == validated_args["domain"]]
+
+        if samples:
+            df_filtered = df_filtered.sample(n=min(samples, len(df_filtered)))
         
         samples = []
         for _, row in df_filtered.iterrows():

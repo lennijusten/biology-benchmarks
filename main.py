@@ -55,7 +55,6 @@ def run_benchmarks(config: dict) -> None:
                 eval_result = eval(
                     task,
                     model=model_name,
-                    limit=benchmark_config.get('samples'),
                     **eval_config
                 )
                 print(f"Completed evaluation for {model_name} on {benchmark_name}")
