@@ -64,6 +64,7 @@ benchmarks:
     domain: Biology
 ```
 * `global_settings`: Default parameters for all models.
+* `environment`: Set environment variables for Inspect.
 * `models`: Specify models to evaluate and their unique settings.
 * `benchmarks`: Configure which benchmarks to run and their parameters.
 
