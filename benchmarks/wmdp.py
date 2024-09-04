@@ -7,14 +7,6 @@ from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
 from datasets import load_dataset
 
-from .base import Benchmark
-from inspect_ai import Task, task
-from inspect_ai.dataset import Sample, MemoryDataset
-from inspect_ai.solver import multiple_choice
-from inspect_ai.scorer import choice
-from datasets import load_dataset
-from typing import List, Dict, Any
-
 class WMDPBenchmark(Benchmark):
     name = "WMDP"
     description = "Weapons of Mass Destruction Proxy Benchmark"
@@ -22,33 +14,12 @@ class WMDPBenchmark(Benchmark):
     default_split = "test"
     default_subset = "wmdp-bio"
     possible_args = {
-        "subset": ["wmdp-bio", "wmdp-cyber", "wmdp-chem"],
         "samples": int
     }
 
-    @classmethod
-    def get_available_splits(cls) -> List[str]:
-        return ["test"]
-
-    @classmethod
-    def get_available_subtasks(cls) -> List[str]:
-        return []  # WMDP doesn't have subtasks
-
-    @classmethod
-    def validate_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:
-        validated_args = super().validate_args(args)
-        
-        # Validate subset
-        if 'subset' not in validated_args:
-            validated_args['subset'] = cls.default_subset
-        elif validated_args['subset'] not in cls.possible_args['subset']:
-            raise ValueError(f"Invalid subset: {validated_args['subset']}. "
-                             f"Available subsets are: {', '.join(cls.possible_args['subset'])}")
-
-        # Ensure split is always "test"
-        validated_args['split'] = "test"
-
-        return validated_args
+    splits = ["test"]
+    subsets = ["wmdp-bio", "wmdp-cyber", "wmdp-chem"]
+    subtasks = []
 
     @classmethod
     @task(category="biology")

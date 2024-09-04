@@ -1,4 +1,4 @@
-## benchmarks/base.py
+# benchmarks/base.py
 
 from typing import List, Dict, Any
 from inspect_ai import Task
@@ -6,39 +6,53 @@ from inspect_ai import Task
 class Benchmark:
     name: str
     description: str
+    hf_hub: str
     default_split: str
+    default_subset: str
     possible_args: Dict[str, Any]
+
+    splits: List[str] = []
+    subsets: List[str] = []
+    subtasks: List[str] = []
 
     @classmethod
     def get_available_splits(cls) -> List[str]:
-        """Return a list of available splits for this benchmark."""
-        raise NotImplementedError
+        return cls.splits
+
+    @classmethod
+    def get_available_subsets(cls) -> List[str]:
+        return cls.subsets
 
     @classmethod
     def get_available_subtasks(cls) -> List[str]:
-        """Return a list of available subtasks for this benchmark."""
-        raise NotImplementedError
+        return cls.subtasks
 
     @classmethod
     def validate_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:
-        validated_args = args.copy()  # Start with a copy of all input args
-        available_subtasks = cls.get_available_subtasks()
-        available_splits = cls.get_available_splits()
+        validated_args = args.copy()
 
-        # Handle subtasks
-        if 'subtasks' not in validated_args or validated_args['subtasks'] == "all" or not validated_args['subtasks']:
-            validated_args['subtasks'] = available_subtasks
-        else:
-            invalid_subtasks = set(validated_args['subtasks']) - set(available_subtasks)
-            if invalid_subtasks:
-                raise ValueError(f"Invalid subtasks: {invalid_subtasks}. Available subtasks are: {available_subtasks}")
-
-        # Handle split
-        if 'split' in validated_args:
-            if validated_args['split'] not in available_splits:
-                raise ValueError(f"Invalid split: {validated_args['split']}. Available splits are: {', '.join(available_splits)}")
-        else:
+        # Validate split
+        if 'split' not in validated_args:
             validated_args['split'] = cls.default_split
+        elif validated_args['split'] not in cls.get_available_splits():
+            raise ValueError(f"Invalid split: {validated_args['split']}. Available splits are: {cls.get_available_splits()}")
+
+        # Validate subset
+        if 'subset' not in validated_args:
+            validated_args['subset'] = cls.default_subset
+        elif validated_args['subset'] not in cls.get_available_subsets():
+            raise ValueError(f"Invalid subset: {validated_args['subset']}. Available subsets are: {cls.get_available_subsets()}")
+
+        # Validate subtasks
+        if 'subtasks' in validated_args:
+            if validated_args['subtasks'] == "all" or not validated_args['subtasks']:
+                validated_args['subtasks'] = cls.get_available_subtasks()
+            else:
+                invalid_subtasks = set(validated_args['subtasks']) - set(cls.get_available_subtasks())
+                if invalid_subtasks:
+                    raise ValueError(f"Invalid subtasks: {invalid_subtasks}. Available subtasks are: {cls.get_available_subtasks()}")
+        else:
+            validated_args['subtasks'] = cls.get_available_subtasks()
 
         # Handle other arguments
         for arg, value in validated_args.items():
@@ -48,7 +62,7 @@ class Benchmark:
                         raise ValueError(f"Invalid type for {arg}. Expected {cls.possible_args[arg]}, got {type(value)}")
                 elif value not in cls.possible_args[arg]:
                     raise ValueError(f"Invalid value for {arg}. Possible values are {cls.possible_args[arg]}")
-            elif arg not in ['subtasks', 'split']:
+            elif arg not in ['split', 'subset', 'subtasks']:
                 raise ValueError(f"Unknown argument: {arg}")
 
         return validated_args
