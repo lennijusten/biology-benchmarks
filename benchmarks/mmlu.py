@@ -29,17 +29,7 @@ class MMLUBenchmark(Benchmark):
 
     @classmethod
     def get_available_splits(cls) -> List[str]:
-        all_splits = set()
-        for subtask in cls.get_available_subtasks():
-            try:
-                ds = load_dataset(cls.hf_hub, subtask)
-                if isinstance(ds, DatasetDict):
-                    all_splits.update(ds.keys())
-                else:
-                    all_splits.add(ds.split)
-            except Exception as e:
-                print(f"Error loading dataset for subtask {subtask}: {str(e)}")
-        return list(all_splits)
+        return ["test", "validation", "dev"]
 
     @classmethod
     def validate_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:

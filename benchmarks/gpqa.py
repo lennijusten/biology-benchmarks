@@ -24,16 +24,7 @@ class GPQABenchmark(Benchmark):
 
     @classmethod
     def get_available_splits(cls) -> List[str]:
-        # GPQA dataset typically has only one split, but let's check to be sure
-        try:
-            ds = load_dataset(cls.hf_hub, cls.default_subset)
-            if isinstance(ds, dict):
-                return list(ds.keys())
-            else:
-                return [ds.split]
-        except Exception as e:
-            print(f"Error loading GPQA dataset: {str(e)}")
-            return []
+        return ["train"]
 
     @classmethod
     def get_available_subtasks(cls) -> List[str]:
