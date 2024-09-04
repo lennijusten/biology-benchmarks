@@ -66,6 +66,12 @@ benchmarks:
     enabled: true
     samples: 35
     split: test
+  lab_bench:
+    enabled: true
+    samples: 10
+    subtasks: 
+      - LitQA2
+      - CloningScenarios
 ```
 * `global_settings`: Default parameters for all models.
 * `environment`: Set environment variables for Inspect.

@@ -6,6 +6,7 @@ import yaml
 from inspect_ai import eval
 from benchmarks.gpqa import GPQABenchmark
 from benchmarks.mmlu_biology import MMLUBiologyBenchmark
+from benchmarks.lab_bench import LABBenchBenchmark
 
 def load_config(config_path: str) -> dict:
     """Load and parse the YAML configuration file"""
@@ -31,8 +32,8 @@ def run_benchmarks(config: dict) -> None:
     
     benchmarks = {
         "gpqa": GPQABenchmark,
-        "mmlu_biology_combined": MMLUBiologyBenchmark
-        # Add other benchmarks here as they are implemented
+        "mmlu_biology_combined": MMLUBiologyBenchmark,
+        "lab_bench": LABBenchBenchmark,
     }
 
     for benchmark_name, benchmark_config in config.get('benchmarks', {}).items():
