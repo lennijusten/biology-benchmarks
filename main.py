@@ -5,7 +5,7 @@ import argparse
 import yaml
 from inspect_ai import eval
 from benchmarks.gpqa import GPQABenchmark
-from benchmarks.mmlu_biology import MMLUBiologyBenchmark
+from benchmarks.mmlu import MMLUBenchmark
 from benchmarks.lab_bench import LABBenchBenchmark
 from benchmarks.wmdp import WMDPBenchmark
 
@@ -33,7 +33,7 @@ def run_benchmarks(config: dict) -> None:
     
     benchmarks = {
         "gpqa": GPQABenchmark,
-        "mmlu_biology_combined": MMLUBiologyBenchmark,
+        "mmlu": MMLUBenchmark,
         "lab_bench": LABBenchBenchmark,
         "wmdp": WMDPBenchmark
     }
@@ -50,9 +50,9 @@ def run_benchmarks(config: dict) -> None:
         for model_name, model_config in config.get('models', {}).items():
             eval_config = get_model_config(model_config, global_settings)
             
-            # Extract benchmark-specific args
+            # Extract all benchmark-specific args
             benchmark_args = {k: v for k, v in benchmark_config.items() 
-                              if k in benchmark_class.possible_args}
+                              if k not in ['enabled']}
             
             try:
                 task = benchmark_class.run(**benchmark_args)
