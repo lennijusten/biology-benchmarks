@@ -27,3 +27,7 @@ benchmarks:
     subtasks: 
       - LitQA2
       - CloningScenarios
+  wmdp:
+    enabled: true
+    samples: 10
+    subset: wmdp-bio

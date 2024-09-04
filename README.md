@@ -1,6 +1,11 @@
 # Biology benchmarks
-This project provides a flexible framework for evaluating Large Language Models (LLMs) on various benchmarks, with a focus on biology-related tasks.
+This project provides a flexible framework for evaluating Large Language Models (LLMs) on various benchmarks, with a focus on biology-related tasks.  
 
+Currently supported benchmarks:
+* [GPQA](https://huggingface.co/datasets/Idavidrein/gpqa) (biology)
+* [MMLU](https://huggingface.co/datasets/cais/mmlu) (biology-focused subtasks)
+* [LAB-Bench](https://huggingface.co/datasets/futurehouse/lab-bench) (CloningScenarios and LitQA2)
+* [WMDP](https://huggingface.co/datasets/cais/wmdp) (biology)
 ## Installation
 
 1. Clone the repository:
@@ -72,6 +77,10 @@ benchmarks:
     subtasks: 
       - LitQA2
       - CloningScenarios
+  wmdp:
+    enabled: true
+    samples: 10
+    subset: wmdp-bio
 ```
 * `global_settings`: Default parameters for all models.
 * `environment`: Set environment variables for Inspect.
