@@ -6,7 +6,7 @@ from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
 from datasets import load_dataset
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 class MMLUBenchmark(Benchmark):
     name = "MMLU"
@@ -15,7 +15,7 @@ class MMLUBenchmark(Benchmark):
     default_split = "test"
     default_subset = "all"
     possible_args = {
-        "samples": int
+        "samples": int,
     }
 
     splits = ["test", "validation", "dev"]
@@ -31,7 +31,9 @@ class MMLUBenchmark(Benchmark):
         validated_args = cls.validate_args(kwargs)
         all_samples = []
 
-        subsets_to_process = cls.subsets if validated_args['subset'] == 'all' else validated_args['subset']
+        subsets_to_process = validated_args['subset']
+        if isinstance(subsets_to_process, str):
+            subsets_to_process = [subsets_to_process]
 
         for subset in subsets_to_process:
             try:

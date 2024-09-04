@@ -29,14 +29,18 @@ class GPQABenchmark(Benchmark):
         validated_args = cls.validate_args(kwargs)
         all_samples = []
 
-        ds = load_dataset(cls.hf_hub, validated_args["subset"], split=validated_args["split"])
-        
-        for subtask in validated_args['subtasks']:
+        subsets_to_process = validated_args['subset']
+        if isinstance(subsets_to_process, str):
+            subsets_to_process = [subsets_to_process]
+
+        for subset in subsets_to_process:
             try:
-                samples = cls.process_subtask(subtask, validated_args, ds)
-                all_samples.extend(samples)
+                ds = load_dataset(cls.hf_hub, subset, split=validated_args["split"])
+                for subtask in validated_args['subtasks']:
+                    samples = cls.process_subtask(subtask, validated_args, ds)
+                    all_samples.extend(samples)
             except Exception as e:
-                print(f"Error processing subtask {subtask}: {str(e)}")
+                print(f"Error processing subset {subset}: {str(e)}")
                 continue
 
         if not all_samples:

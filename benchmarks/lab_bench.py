@@ -7,7 +7,7 @@ from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
 from datasets import load_dataset
 import random
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 class LABBenchBenchmark(Benchmark):
     name = "LAB-Bench"
