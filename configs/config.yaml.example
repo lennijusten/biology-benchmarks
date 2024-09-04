@@ -17,3 +17,8 @@ benchmarks:
     samples: 100
     dataset: gpqa_main
     domain: Biology
+  mmlu_biology_combined:
+    enabled: true
+    file: benchmarks/mmlu_biology.py
+    samples: 35
+    split: test

@@ -31,7 +31,7 @@ def run_benchmarks(config: dict) -> None:
     
     benchmarks = {
         "gpqa": GPQABenchmark,
-        "mmlu_biology": MMLUBiologyBenchmark
+        "mmlu_biology_combined": MMLUBiologyBenchmark
         # Add other benchmarks here as they are implemented
     }
 
