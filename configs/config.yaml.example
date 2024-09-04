@@ -19,6 +19,5 @@ benchmarks:
     domain: Biology
   mmlu_biology_combined:
     enabled: true
-    file: benchmarks/mmlu_biology.py
     samples: 35
     split: test

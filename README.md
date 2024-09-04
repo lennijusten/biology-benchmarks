@@ -48,7 +48,7 @@ global_settings:
   max_tokens: 1000
 
 environment:
-  INSPECT_LOG_DIR: ./logs/gpqa-biology
+  INSPECT_LOG_DIR: ./logs/biology
 
 models:
   google/gemini-1.5-pro:
@@ -62,6 +62,10 @@ benchmarks:
     samples: 100
     dataset: gpqa_main
     domain: Biology
+  mmlu_biology_combined:
+    enabled: true
+    samples: 35
+    split: test
 ```
 * `global_settings`: Default parameters for all models.
 * `environment`: Set environment variables for Inspect.
