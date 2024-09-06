@@ -15,17 +15,11 @@ class TavilyRAG(BaseRAG):
 
     async def optimize_query(self, query: str, choices_str: str) -> str:
         system_prompt = """You are an expert in crafting optimized search queries and extracting keywords for scientific research. Your task is to take the user input and:
-        1) Create a concise, focused Google search query based on the given question. This query should be specifically designed to return information that is most useful and relevant for answering the original question. Focus on the core concepts and any specific techniques or problems mentioned.
-        2) Extract relevant keywords optimized for scientific database searches.
-        
-        Follow best practices for Google search and scientific keyword extraction.
-        
-        If the question refers to an image, focus the search query on gathering information to answer the question about the image's content, not on finding the specific image itself.
+        1) Create a concise, focused Google search query based on the given question and answer choices. This query should be specifically designed to return information that is most useful and relevant for answering the original question. Focus on the core concepts and any specific techniques or problems mentioned.
         
         Provide your response in the following JSON format:
         {
         "google_query": "Your optimized Google search query here",
-        "scientific_keywords": ["keyword1", "keyword2", "keyword3", ...]
         }
         """
 
