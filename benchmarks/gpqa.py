@@ -5,9 +5,16 @@ from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
+from solvers.rag_solver import rag_solver
+from rag.tavily_rag import TavilyRAG
 from datasets import load_dataset
 import random
 from typing import List, Dict, Any
+
+RAG_TOOLS = {
+    "tavily": TavilyRAG,
+    # Add other RAG tools here
+}
 
 class GPQABenchmark(Benchmark):
     name = "GPQA"
@@ -17,6 +24,7 @@ class GPQABenchmark(Benchmark):
     default_subset = "gpqa_main"
     possible_args = {
         "samples": int,
+        "rag_config": dict,
     }
 
     splits = ["train"]
@@ -45,10 +53,22 @@ class GPQABenchmark(Benchmark):
 
         if not all_samples:
             raise ValueError("No valid samples were generated. Please check your configuration and try again.")
+        
+        plan = []
+        rag_config = validated_args.get('rag_config', {})
+        if rag_config and rag_config.get('enabled'):
+            rag_tool = rag_config.get('tool')
+            if rag_tool in RAG_TOOLS:
+                rag_class = RAG_TOOLS[rag_tool]
+                rag_instance = rag_class(**rag_config.get(rag_tool, {}))
+                plan.append(rag_solver(rag_instance))
+            else:
+                print(f"Warning: RAG tool '{rag_tool}' not found. Skipping RAG.")
+        plan.append(multiple_choice())
 
         return Task(
             dataset=MemoryDataset(all_samples),
-            plan=[multiple_choice()],
+            plan=plan,
             scorer=choice()
         )
 
@@ -83,3 +103,21 @@ class GPQABenchmark(Benchmark):
             samples.append(sample)
 
         return samples
+    
+    @classmethod
+    def validate_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:
+        validated_args = super().validate_args(args)
+        
+        # Validate rag_config if present
+        if 'rag_config' in validated_args:
+            rag_config = validated_args['rag_config']
+            if not isinstance(rag_config, dict):
+                raise ValueError("rag_config must be a dictionary")
+            
+            if rag_config.get('enabled'):
+                if 'tool' not in rag_config:
+                    raise ValueError("rag_config must specify a 'tool' when enabled")
+                if rag_config['tool'] not in RAG_TOOLS:
+                    raise ValueError(f"Unsupported RAG tool: {rag_config['tool']}")
+        
+        return validated_args

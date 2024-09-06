@@ -67,13 +67,13 @@ class Benchmark:
 
         # Handle other arguments
         for arg, value in validated_args.items():
-            if arg in cls.possible_args and arg not in ['split', 'subset', 'subtasks']:
+            if arg in cls.possible_args:
                 if isinstance(cls.possible_args[arg], type):
                     if not isinstance(value, cls.possible_args[arg]):
                         raise ValueError(f"Invalid type for {arg}. Expected {cls.possible_args[arg]}, got {type(value)}")
-                elif value not in cls.possible_args[arg]:
+                elif isinstance(cls.possible_args[arg], list) and value not in cls.possible_args[arg]:
                     raise ValueError(f"Invalid value for {arg}. Possible values are {cls.possible_args[arg]}")
-            elif arg not in ['split', 'subset', 'subtasks']:
+            elif arg not in ['split', 'subset', 'subtasks', 'rag_config']:
                 raise ValueError(f"Unknown argument: {arg}")
 
         return validated_args

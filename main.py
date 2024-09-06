@@ -42,6 +42,8 @@ def run_benchmarks(config: dict) -> None:
     if isinstance(models, list):
         models = {model: {} for model in models}
 
+    rag_config = config.get('rag', {})
+
     for benchmark_name, benchmark_config in config.get('benchmarks', {}).items():
         if not benchmark_config.get('enabled', True):
             continue
@@ -57,6 +59,9 @@ def run_benchmarks(config: dict) -> None:
             # Extract all benchmark-specific args
             benchmark_args = {k: v for k, v in benchmark_config.items() 
                               if k not in ['enabled']}
+            
+            if rag_config.get('enabled'):
+                benchmark_args['rag_config'] = rag_config
             
             try:
                 task = benchmark_class.run(**benchmark_args)
