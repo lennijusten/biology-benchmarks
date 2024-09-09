@@ -1,6 +1,6 @@
 # rag/tavily_rag.py
 
-from .base_rag import BaseRAG
+from .base import BaseRAG
 from tavily import TavilyClient
 import os
 import json

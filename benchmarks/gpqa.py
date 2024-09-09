@@ -1,35 +1,36 @@
 # benchmarks/gpqa.py
 
 from .base import Benchmark
+from utils.arg_validation import BenchmarkSchema, ArgumentSchema, validate_rag_config
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
 from solvers.rag_solver import rag_solver
-from rag.tavily_rag import TavilyRAG
+from rag.tools import RAG_TOOLS
 from datasets import load_dataset
 import random
 from typing import List, Dict, Any
 
-RAG_TOOLS = {
-    "tavily": TavilyRAG,
-    # Add other RAG tools here
-}
+GPQA_SPLITS = ["train"]
+GPQA_SUBSETS = ["gpqa_main", "gpqa_diamond", "gpqa_experts", "gpqa_extended"]
+GPQA_SUBTASKS = ["Biology", "Chemistry", "Physics"]
 
 class GPQABenchmark(Benchmark):
     name = "GPQA"
     description = "Graduate-level Google-Proof Q&A Benchmark"
     hf_hub = "Idavidrein/gpqa"
-    default_split = "train"
-    default_subset = "gpqa_main"
-    possible_args = {
-        "samples": int,
-        "rag_config": dict,
-    }
-
-    splits = ["train"]
-    subsets = ["gpqa_main", "gpqa_diamond", "gpqa_experts", "gpqa_extended"]
-    subtasks = ["Biology", "Chemistry", "Physics"]
+    schema = BenchmarkSchema(
+        splits=GPQA_SPLITS,
+        subsets=GPQA_SUBSETS,
+        subtasks=GPQA_SUBTASKS,
+        default_split="train",
+        default_subset="gpqa_main",
+        additional_args={
+            "samples": ArgumentSchema(int),
+            "rag_config": ArgumentSchema(dict, validator=validate_rag_config)
+        }
+    )
 
     @classmethod
     @task(category="biology")
@@ -103,21 +104,3 @@ class GPQABenchmark(Benchmark):
             samples.append(sample)
 
         return samples
-    
-    @classmethod
-    def validate_args(cls, args: Dict[str, Any]) -> Dict[str, Any]:
-        validated_args = super().validate_args(args)
-        
-        # Validate rag_config if present
-        if 'rag_config' in validated_args:
-            rag_config = validated_args['rag_config']
-            if not isinstance(rag_config, dict):
-                raise ValueError("rag_config must be a dictionary")
-            
-            if rag_config.get('enabled'):
-                if 'tool' not in rag_config:
-                    raise ValueError("rag_config must specify a 'tool' when enabled")
-                if rag_config['tool'] not in RAG_TOOLS:
-                    raise ValueError(f"Unsupported RAG tool: {rag_config['tool']}")
-        
-        return validated_args

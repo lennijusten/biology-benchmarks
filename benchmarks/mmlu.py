@@ -6,32 +6,32 @@ from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
 from solvers.rag_solver import rag_solver
-from rag.tavily_rag import TavilyRAG
+from rag.tools import RAG_TOOLS
+from utils.arg_validation import BenchmarkSchema, ArgumentSchema, validate_rag_config
 from datasets import load_dataset
 from typing import List, Dict, Any, Union
 
-RAG_TOOLS = {
-    "tavily": TavilyRAG,
-    # Add other RAG tools here
-}
+MMLU_SPLITS = ["test", "validation", "dev"]
+MMLU_SUBSETS = [
+    "anatomy", "college_biology", "college_medicine", "high_school_biology", 
+    "medical_genetics", "professional_medicine", "virology"
+]
 
 class MMLUBenchmark(Benchmark):
     name = "MMLU"
     description = "Measuring Massive Multitask Language Understanding"
     hf_hub = "cais/mmlu"
-    default_split = "test"
-    default_subset = "all"
-    possible_args = {
-        "samples": int,
-        "rag_config": dict,
-    }
-
-    splits = ["test", "validation", "dev"]
-    subsets = [
-        "anatomy", "college_biology", "college_medicine", "high_school_biology", 
-        "medical_genetics", "professional_medicine", "virology"
-    ]
-    subtasks = []
+    schema = BenchmarkSchema(
+        splits=MMLU_SPLITS,
+        subsets=MMLU_SUBSETS,
+        subtasks=[],
+        default_split="test",
+        default_subset="all",
+        additional_args={
+            "samples": ArgumentSchema(int),
+            "rag_config": ArgumentSchema(dict, validator=validate_rag_config)
+        }
+    )
 
     @classmethod
     @task(category="biology")

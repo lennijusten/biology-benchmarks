@@ -38,12 +38,6 @@ def run_benchmarks(config: dict) -> None:
         "wmdp": WMDPBenchmark
     }
 
-    models = config.get('models', {})
-    if isinstance(models, list):
-        models = {model: {} for model in models}
-
-    rag_config = config.get('rag', {})
-
     for benchmark_name, benchmark_config in config.get('benchmarks', {}).items():
         if not benchmark_config.get('enabled', True):
             continue
@@ -53,14 +47,20 @@ def run_benchmarks(config: dict) -> None:
             print(f"Warning: Benchmark {benchmark_name} not found. Skipping.")
             continue
 
-        for model_name, model_config in models.items():
+        for model_key, model_config in config.get('models', {}).items():
             eval_config = get_model_config(model_config, global_settings)
+            
+            # Extract the actual model name from the config
+            model_name = model_config.get('model', model_key)
+            eval_config.pop('model', None)
             
             # Extract all benchmark-specific args
             benchmark_args = {k: v for k, v in benchmark_config.items() 
-                              if k not in ['enabled']}
+                            if k not in ['enabled']}
             
-            if rag_config.get('enabled'):
+            # Handle RAG configuration for this specific model
+            rag_config = model_config.get('rag')
+            if rag_config:
                 benchmark_args['rag_config'] = rag_config
             
             try:
@@ -70,9 +70,9 @@ def run_benchmarks(config: dict) -> None:
                     model=model_name,
                     **eval_config
                 )
-                print(f"Completed evaluation for {model_name} on {benchmark_name}")
+                print(f"Completed evaluation for {model_key} on {benchmark_name}")
             except ValueError as e:
-                print(f"Error running {benchmark_name} with {model_name}: {str(e)}")
+                print(f"Error running {benchmark_name} with {model_key}: {str(e)}")
 
 def main():
     parser = argparse.ArgumentParser(description="Run LLM benchmarks")
