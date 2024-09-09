@@ -5,8 +5,15 @@ from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
+from solvers.rag_solver import rag_solver
+from rag.tavily_rag import TavilyRAG
 from datasets import load_dataset
 from typing import List, Dict, Any, Union
+
+RAG_TOOLS = {
+    "tavily": TavilyRAG,
+    # Add other RAG tools here
+}
 
 class MMLUBenchmark(Benchmark):
     name = "MMLU"
@@ -16,6 +23,7 @@ class MMLUBenchmark(Benchmark):
     default_subset = "all"
     possible_args = {
         "samples": int,
+        "rag_config": dict,
     }
 
     splits = ["test", "validation", "dev"]
@@ -47,9 +55,21 @@ class MMLUBenchmark(Benchmark):
         if not all_samples:
             raise ValueError("No valid samples were generated. Please check your configuration and try again.")
 
+        plan = []
+        rag_config = validated_args.get('rag_config', {})
+        if rag_config and rag_config.get('enabled'):
+            rag_tool = rag_config.get('tool')
+            if rag_tool in RAG_TOOLS:
+                rag_class = RAG_TOOLS[rag_tool]
+                rag_instance = rag_class(**rag_config.get(rag_tool, {}))
+                plan.append(rag_solver(rag_instance))
+            else:
+                print(f"Warning: RAG tool '{rag_tool}' not found. Skipping RAG.")
+        plan.append(multiple_choice())
+        
         return Task(
             dataset=MemoryDataset(all_samples),
-            plan=[multiple_choice()],
+            plan=plan,
             scorer=choice()
         )
 
