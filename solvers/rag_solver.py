@@ -1,11 +1,11 @@
 # solvers/rag_solver.py
 
-from inspect_ai.solver import solver, Solver, TaskState, Generate
+from inspect_ai.solver import solver, TaskState
 from rag.base_rag import BaseRAG
 
 @solver
 def rag_solver(rag_instance: BaseRAG):
-    async def solve(state: TaskState, generate: Generate) -> TaskState:
+    async def solve(state: TaskState) -> TaskState:
         query = state.input_text
         choices = state.choices if hasattr(state, 'choices') else []
         
