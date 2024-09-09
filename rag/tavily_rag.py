@@ -4,18 +4,20 @@ from .base_rag import BaseRAG
 from tavily import TavilyClient
 import os
 import json
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 
 
 class TavilyRAG(BaseRAG):
+    # TODO: save search query and RAG context
+
     def __init__(self, **kwargs):
         self.tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
         self.openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         self.kwargs = kwargs
 
     async def optimize_query(self, query: str, choices_str: str) -> str:
-        system_prompt = """You are an expert in crafting optimized search queries and extracting keywords for scientific research. Your task is to take the user input and:
-        1) Create a concise, focused Google search query based on the given question and answer choices. This query should be specifically designed to return information that is most useful and relevant for answering the original question. Focus on the core concepts and any specific techniques or problems mentioned.
+        system_prompt = """You are an expert in crafting optimized search queries. Your task is to take the user input and:
+        1) Create a concise, focused Google search query based on the given question and answer choices. This query should be specifically designed to return information that is most useful and relevant for answering the original question. Focus on rare concepts and any specific techniques or problems mentioned.
         
         Provide your response in the following JSON format:
         {
