@@ -1,8 +1,11 @@
 # rag/tools.py
 
 from .tavily import TavilyRAG
+from .google import GoogleRAG
+from .pubmed import PubMedRAG
 
 RAG_TOOLS = {
     "tavily": TavilyRAG,
-    # Add other RAG tools here as they are implemented
+    "google": GoogleRAG,
+    "pubmed": PubMedRAG,
 }
