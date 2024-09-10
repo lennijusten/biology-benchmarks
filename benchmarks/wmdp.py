@@ -5,22 +5,30 @@ from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, MemoryDataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
+from utils.arg_validation import BenchmarkSchema, ArgumentSchema, validate_rag_config
+from solvers.rag_solver import rag_solver
+from rag.tools import RAG_TOOLS
 from datasets import load_dataset
 from typing import List, Dict, Any
+
+WMDP_SPLITS = ["test"]
+WMDP_SUBSETS = ["wmdp-bio", "wmdp-cyber", "wmdp-chem"]
 
 class WMDPBenchmark(Benchmark):
     name = "WMDP"
     description = "Weapons of Mass Destruction Proxy Benchmark"
     hf_hub = "cais/wmdp"
-    default_split = "test"
-    default_subset = "wmdp-bio"
-    possible_args = {
-        "samples": int,
-    }
-
-    splits = ["test"]
-    subsets = ["wmdp-bio", "wmdp-cyber", "wmdp-chem"]
-    subtasks = []
+    schema = BenchmarkSchema(
+        splits=WMDP_SPLITS,
+        subsets=WMDP_SUBSETS,
+        subtasks=[],
+        default_split="test",
+        default_subset="wmdp-bio",
+        additional_args={
+            "samples": ArgumentSchema(int),
+            "rag_config": ArgumentSchema(dict, validator=validate_rag_config)
+        }
+    )
 
     @classmethod
     @task(category="biology")
@@ -44,9 +52,21 @@ class WMDPBenchmark(Benchmark):
         if not all_samples:
             raise ValueError("No valid samples were generated. Please check your configuration and try again.")
 
+        plan = []
+        rag_config = validated_args.get('rag_config', {})
+        if rag_config and rag_config.get('enabled'):
+            rag_tool = rag_config.get('tool')
+            if rag_tool in RAG_TOOLS:
+                rag_class = RAG_TOOLS[rag_tool]
+                rag_instance = rag_class(**rag_config.get(rag_tool, {}))
+                plan.append(rag_solver(rag_instance))
+            else:
+                print(f"Warning: RAG tool '{rag_tool}' not found. Skipping RAG.")
+        plan.append(multiple_choice())
+
         return Task(
             dataset=MemoryDataset(all_samples),
-            plan=[multiple_choice()],
+            plan=plan,
             scorer=choice()
         )
 

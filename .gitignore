@@ -5,5 +5,5 @@
 logs/
 create_code_summary.py
 files_to_include.txt
-benchmarks/__pycache__/
+**/__pycache__/
 notes.md
