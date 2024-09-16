@@ -23,5 +23,5 @@ together/meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo	Llama 3.1-70B	0	$0.88			ht
 together/meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo	Llama 3.1-8B	0	$0.18			https://api.together.xyz/models/meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo	2024-09-03		
 together/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	Llama 3-70B	1	$0.88			https://api.together.xyz/models/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	2024-09-03		
 together/meta-llama/Meta-Llama-3-8B-Instruct-Turbo	Llama 3-8B	0	$0.18			https://api.together.xyz/models/meta-llama/Meta-Llama-3-8B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Meta-Llama-3-8B-Instruct-Turbo	2024-09-03		
-together/meta-llama/Llama-2-13b-chat-hf	Llama 2-13B	0	$0.22			https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	2024-09-03		
-together/meta-llama/Llama-2-70b-hf	Llama 2-70B	1	$0.90			https://api.together.xyz/models/meta-llama/Llama-2-70b-hf	https://api.together.xyz/models/meta-llama/Llama-2-70b-hf	2024-09-03		
+together/meta-llama/Llama-2-13b-chat-hf	Llama 2-13B	1	$0.22			https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	2024-09-03		
+together/meta-llama/Llama-2-70b-hf	Llama 2-70B	0	$0.90			https://api.together.xyz/models/meta-llama/Llama-2-70b-hf	https://api.together.xyz/models/meta-llama/Llama-2-70b-hf	2024-09-03		
