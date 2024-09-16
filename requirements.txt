@@ -12,3 +12,4 @@ mistralai
 tavily-python
 pyyaml
 matplotlib
+gradio_client
