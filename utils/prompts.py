@@ -1,13 +1,5 @@
 # utils/prompts.py
 
-MULTIPLE_CHOICE_TEMPLATE_COT = r"""
-Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of {letters}. Think step by step before answering.
-
-{question}
-
-{choices}
-""".strip()
-
 # Copied from Inspect implementation: https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/src/inspect_ai/solver/_multiple_choice.py
 SINGLE_ANSWER_TEMPLATE = r"""
 Answer the following multiple choice question. The entire content of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of {letters}.
@@ -36,10 +28,9 @@ Answer the following multiple choice question. The last line of your response sh
 {choices}
 """.strip()
 
-FEWSHOT_TEMPLATE = r"""
-Answer the following multiple choice question. The entire content of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of {letters}.
+FEWSHOT_EXAMPLE_TEMPLATE = "\n{question}\n\n{choices}\n\nANSWER: {target}\n"
 
+MULTIPLE_CHOICE_TEMPLATE_FEWSHOT = r"""
 {examples}
 {question}
-{choices}
 """.strip()
