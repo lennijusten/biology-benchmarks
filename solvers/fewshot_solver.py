@@ -6,11 +6,11 @@ from typing import Callable
 @solver
 def fewshot_solver(get_fewshot_examples: Callable[[str], str], fewshot_template: str):
     async def solve(state: TaskState, generate: Generate) -> TaskState:
-        sample_id = state.sample_id
-        examples = get_fewshot_examples(sample_id)
+        sample_input_text = state.input_text
+        examples = get_fewshot_examples(sample_input_text)
         
         # Prepare the choices string
-        choices_str = "\n".join([f"{chr(65+i)}. {c.value}" for i, c in enumerate(state.choices)])
+        choices_str = "\n\n".join([f"{chr(65+i)}. {c.value}" for i, c in enumerate(state.choices)])
         
         # Format the full prompt with few-shot examples
         fewshot_prompt = fewshot_template.format(
