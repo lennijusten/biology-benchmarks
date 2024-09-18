@@ -5,7 +5,7 @@ import argparse
 import yaml
 from inspect_ai import eval
 from benchmarks.gpqa import gpqa
-from benchmarks.mmlu import MMLUBenchmark
+from benchmarks.mmlu import mmlu
 from benchmarks.lab_bench import LABBenchBenchmark
 from benchmarks.wmdp import WMDPBenchmark
 
@@ -33,7 +33,7 @@ def run_benchmarks(config: dict) -> None:
     
     benchmarks = {
         "gpqa": gpqa,
-        "mmlu": MMLUBenchmark,
+        "mmlu": mmlu,
         "lab_bench": LABBenchBenchmark,
         "wmdp": WMDPBenchmark
     }
@@ -71,7 +71,7 @@ def run_benchmarks(config: dict) -> None:
                 print(f"Completed evaluation for {model_key} on {benchmark_name}")
             except ValueError as e:
                 print(f"Error running {benchmark_name} with {model_key}: {str(e)}")
-                
+
 def main():
     parser = argparse.ArgumentParser(description="Run LLM benchmarks")
     parser.add_argument("--config", required=True, help="Path to config file")
