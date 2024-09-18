@@ -7,7 +7,7 @@ from inspect_ai import eval
 from benchmarks.gpqa import gpqa
 from benchmarks.mmlu import mmlu
 from benchmarks.lab_bench import LABBenchBenchmark
-from benchmarks.wmdp import WMDPBenchmark
+from benchmarks.wmdp import wmdp
 
 def load_config(config_path: str) -> dict:
     """Load and parse the YAML configuration file"""
@@ -35,7 +35,7 @@ def run_benchmarks(config: dict) -> None:
         "gpqa": gpqa,
         "mmlu": mmlu,
         "lab_bench": LABBenchBenchmark,
-        "wmdp": WMDPBenchmark
+        "wmdp": wmdp
     }
 
     
