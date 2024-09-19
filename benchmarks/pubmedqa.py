@@ -17,7 +17,7 @@ import random
 
 PUBMEDQA_SPLITS = ["test", "train", "validation"]
 PUBMEDQA_SUBSETS = [f"pubmed_qa_labeled_fold{i}_bigbio_qa" for i in range(10)] + ["pubmed_qa_artificial_bigbio_qa", "pubmed_qa_unlabeled_bigbio_qa"]
-PUBMEDQA_SUBTASKS = ["labeled"]
+PUBMEDQA_SUBTASKS = None
 
 def record_to_sample(record) -> Sample:
     choices = {
@@ -56,13 +56,7 @@ def pubmedqa(subset: str = "pubmed_qa_labeled_fold0_bigbio_qa",
     if split not in PUBMEDQA_SPLITS:
         raise ValueError(f"Invalid split: {split}. Available splits are: {PUBMEDQA_SPLITS}")
     
-    if subtasks:
-        if subtasks == 'labeled':
-            subsets_to_process = [f"pubmed_qa_labeled_fold{i}_bigbio_qa" for i in range(10)]
-        else:
-            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {PUBMEDQA_SUBTASKS}")
-    else:
-        subsets_to_process = PUBMEDQA_SUBSETS if subset == "all" else [subset]
+    subsets_to_process = PUBMEDQA_SUBSETS if subset == "all" else [subset]
 
     all_samples = []
     for current_subset in subsets_to_process:
