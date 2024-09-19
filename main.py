@@ -9,6 +9,7 @@ from benchmarks.mmlu import mmlu
 from benchmarks.lab_bench import lab_bench
 from benchmarks.wmdp import wmdp
 from benchmarks.mmlu_pro import mmlu_pro
+from benchmarks.pubmedqa import pubmedqa
 
 def load_config(config_path: str) -> dict:
     """Load and parse the YAML configuration file"""
@@ -37,7 +38,8 @@ def run_benchmarks(config: dict) -> None:
         "mmlu": mmlu,
         "mmlu_pro": mmlu_pro,
         "lab_bench": lab_bench,
-        "wmdp": wmdp
+        "wmdp": wmdp,
+        "pubmedqa": pubmedqa
     }
 
     
