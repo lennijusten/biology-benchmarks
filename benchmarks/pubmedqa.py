@@ -60,7 +60,7 @@ def pubmedqa(subset: str = "pubmed_qa_labeled_fold0_bigbio_qa",
         if subtasks == 'labeled':
             subsets_to_process = [f"pubmed_qa_labeled_fold{i}_bigbio_qa" for i in range(10)]
         else:
-            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {PUBMEDQA_SUBSETS}")
+            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {PUBMEDQA_SUBTASKS}")
     else:
         subsets_to_process = PUBMEDQA_SUBSETS if subset == "all" else [subset]
 
