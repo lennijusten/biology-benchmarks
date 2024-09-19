@@ -28,7 +28,7 @@ MMLU_SUBSETS = ['abstract_algebra', 'anatomy', 'astronomy', 'business_ethics', '
                 'moral_disputes', 'moral_scenarios', 'nutrition', 'philosophy', 'prehistory', 'professional_accounting', 
                 'professional_law', 'professional_medicine', 'professional_psychology', 'public_relations', 
                 'security_studies', 'sociology', 'us_foreign_policy', 'virology', 'world_religions']
-MMLU_SUBTASKS = ['Biology']
+MMLU_SUBTASKS = ['biology']
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
     choices = record['choices']
