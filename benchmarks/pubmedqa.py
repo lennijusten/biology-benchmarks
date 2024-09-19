@@ -12,12 +12,12 @@ from utils.prompts import (
     FEWSHOT_EXAMPLE_TEMPLATE,
     MULTIPLE_CHOICE_TEMPLATE_FEWSHOT
 )
-from typing import List, Dict, Any, Optional
+from typing import Optional
 import random
 
 PUBMEDQA_SPLITS = ["test", "train", "validation"]
 PUBMEDQA_SUBSETS = [f"pubmed_qa_labeled_fold{i}_bigbio_qa" for i in range(10)] + ["pubmed_qa_artificial_bigbio_qa", "pubmed_qa_unlabeled_bigbio_qa"]
-PUBMEDQA_SUBTASKS = None
+PUBMEDQA_SUBTASKS = ["labeled"]
 
 def record_to_sample(record) -> Sample:
     choices = {
@@ -42,33 +42,44 @@ def sample_to_fewshot(sample: Sample, template: str = FEWSHOT_EXAMPLE_TEMPLATE) 
     choices_str = "\n".join([f"{chr(ord('A') + i)}. {choice}" for i, choice in enumerate(sample.choices)])
     return template.format(question=sample.input, choices=choices_str, target=sample.target)
 
-@task(category="biology")
+@task
 def pubmedqa(subset: str = "pubmed_qa_labeled_fold0_bigbio_qa",
+             subtasks: Optional[str] = None,
              split: str = "test",
              samples: Optional[int] = None,
              cot: bool = False,
              n_shot: int = 0) -> Task:
     
-    if subset not in PUBMEDQA_SUBSETS:
-        raise ValueError(f"Invalid subset: {subset}. Available subsets are: {PUBMEDQA_SUBSETS}")
+    if subset is not None and subset != "all" and subset not in PUBMEDQA_SUBSETS:
+            raise ValueError(f"Invalid subset: {subset}. Available subsets are: {PUBMEDQA_SUBSETS} or 'all'")
     
     if split not in PUBMEDQA_SPLITS:
         raise ValueError(f"Invalid split: {split}. Available splits are: {PUBMEDQA_SPLITS}")
     
-    dataset = hf_dataset(
-        path="bigbio/pubmed_qa",
-        name=subset,
-        split=split,
-        sample_fields=record_to_sample,
-        trust=True
-    )
+    if subtasks:
+        if subtasks == 'labeled':
+            subsets_to_process = [f"pubmed_qa_labeled_fold{i}_bigbio_qa" for i in range(10)]
+        else:
+            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {PUBMEDQA_SUBSETS}")
+    else:
+        subsets_to_process = PUBMEDQA_SUBSETS if subset == "all" else [subset]
+
+    all_samples = []
+    for current_subset in subsets_to_process:
+        dataset = hf_dataset(
+            path="bigbio/pubmed_qa",
+            name=current_subset,
+            split=split,
+            sample_fields=record_to_sample,
+        )
+        all_samples.extend(dataset)
     
     # Sample if needed
-    if samples and samples < len(dataset):
-        all_samples = list(dataset)
+    if samples and samples < len(all_samples):
         random.seed(42)
-        sampled_data = random.sample(all_samples, samples)
-        dataset = MemoryDataset(sampled_data)
+        all_samples = random.sample(all_samples, samples)
+    
+    dataset = MemoryDataset(all_samples)
     
     plan = []
     if cot:
