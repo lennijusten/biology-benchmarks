@@ -49,7 +49,7 @@ def sample_to_fewshot(sample: Sample, template: str = FEWSHOT_EXAMPLE_TEMPLATE) 
     choices_str = "\n\n".join([f"{chr(ord('A') + i)}. {choice}" for i, choice in enumerate(sample.choices)])
     return template.format(question=sample.input, choices=choices_str, target=sample.target)
 
-@task(category="biology")
+@task
 def gpqa(subset: str = "gpqa_main", 
          subtasks: Optional[List[str]] = None, 
          split: str = "train",

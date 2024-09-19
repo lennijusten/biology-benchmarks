@@ -1,4 +1,4 @@
-# benchmarks/wmdp.py
+# benchmarks/mmlu_pro.py
 
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, hf_dataset, MemoryDataset
@@ -14,44 +14,54 @@ from utils.prompts import (
 from typing import List, Dict, Any, Optional
 import random
 
-WMDP_SPLITS = ["test"]
-WMDP_SUBSETS = ["wmdp-bio", "wmdp-cyber", "wmdp-chem"]
+MMLU_PRO_SPLITS = ["test", "validation"]
+MMLU_PRO_SUBSETS = None
+MMLU_PRO_SUBTASKS = ["biology", "medicine"]
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
-    choices = record['choices']
-    correct_index = record['answer']
-    correct_letter = chr(ord('A') + correct_index)
-    
     return Sample(
-        input=record['question'],
-        target=correct_letter,
-        choices=choices
+        id=record["question_id"],
+        input=record["question"],
+        target=record["answer"],
+        choices=record["options"],
+        metadata={
+            "category": record["category"],
+            "cot_content": record["cot_content"],
+            "src": record["src"],
+        }
     )
 
 def sample_to_fewshot(sample: Sample, template: str = FEWSHOT_EXAMPLE_TEMPLATE) -> str:
-    choices_str = "\n\n".join([f"{chr(ord('A') + i)}. {choice}" for i, choice in enumerate(sample.choices)])
+    choices_str = "\n".join([f"{chr(ord('A') + i)}. {choice}" for i, choice in enumerate(sample.choices)])
     return template.format(question=sample.input, choices=choices_str, target=sample.target)
 
 @task
-def wmdp(subset: str = "wmdp-bio", 
-         split: str = "test",
-         samples: Optional[int] = None,
-         cot: bool = False,
-         n_shot: int = 0) -> Task:
+def mmlu_pro(subsets: Optional[List[str]] = None,
+             split: str = "test",
+             samples: Optional[int] = None,
+             cot: bool = False,
+             n_shot: int = 0) -> Task:
     
-    if subset not in WMDP_SUBSETS:
-        raise ValueError(f"Invalid subset: {subset}. Available subsets are: {WMDP_SUBSETS}")
+    if subjects is not None:
+        invalid_subjects = set(subjects) - set(MMLU_PRO_SUBJECTS)
+        if invalid_subjects:
+            raise ValueError(f"Invalid subjects: {invalid_subjects}. Available subjects are: {MMLU_PRO_SUBJECTS}")
+    else:
+        subjects = MMLU_PRO_SUBJECTS
     
-    if split not in WMDP_SPLITS:
-        raise ValueError(f"Invalid split: {split}. Available splits are: {WMDP_SPLITS}")
+    if split not in MMLU_PRO_SPLITS:
+        raise ValueError(f"Invalid split: {split}. Available splits are: {MMLU_PRO_SPLITS}")
     
     dataset = hf_dataset(
-        path="cais/wmdp",
-        name=subset,
+        path="TIGER-Lab/MMLU-Pro",
         split=split,
         sample_fields=record_to_sample,
+        trust=True
     )
     
+    # Filter by subjects
+    dataset = MemoryDataset([s for s in dataset if s.metadata.get('subject') in subjects])
+        
     # Sample if needed
     if samples and samples < len(dataset):
         all_samples = list(dataset)
@@ -85,4 +95,3 @@ def wmdp(subset: str = "wmdp-bio",
         plan=plan,
         scorer=choice(),
     )
-    
