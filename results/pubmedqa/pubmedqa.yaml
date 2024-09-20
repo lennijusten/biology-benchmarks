@@ -1,0 +1,25 @@
+environment:
+  INSPECT_LOG_DIR: ./logs/pubmedqa
+
+models:
+  google/gemini-1.5-pro: {}
+  google/gemini-1.0-pro: {}
+  openai/gpt-4: {}
+  openai/gpt-4-turbo: {}
+  openai/gpt-4o: {}
+  openai/gpt-4o-mini: {}
+  openai/gpt-3.5-turbo: {}
+  anthropic/claude-3-5-sonnet-20240620: {}
+  anthropic/claude-3-opus-20240229: {}
+  anthropic/claude-2.0: {}
+  mistral/mistral-large-2407: {}
+  mistral/open-mixtral-8x7b: {}
+  together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: {}
+  together/meta-llama/Meta-Llama-3-70B-Instruct-Turbo: {}
+  together/meta-llama/Llama-2-13b-chat-hf: {}
+
+benchmarks:
+  pubmedqa:
+    enabled: true
+    subset: pubmed_qa_labeled_fold0_bigbio_qa
+    split: test
