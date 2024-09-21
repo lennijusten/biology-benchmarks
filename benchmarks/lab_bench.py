@@ -15,9 +15,9 @@ from typing import Dict, Any, Optional
 import random
 
 LAB_BENCH_SPLITS = ["train"]
-LAB_BENCH_SUBSETS = ["LitQA2", "CloningScenarios"]
+LAB_BENCH_SUBSETS = ["LitQA2", "CloningScenarios", "ProtocolQA"]
 
-def record_to_sample(record: Dict[str, Any]) -> Sample:
+def record_to_sample_litqa_cloning(record: Dict[str, Any]) -> Sample:
     choices = record['distractors'] + [record['ideal']]
     random.shuffle(choices)
     correct_index = choices.index(record['ideal'])
@@ -32,6 +32,19 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
             'key_passage': record.get('key-passage', ''),
             'sources': record.get('sources', [])
         }
+    )
+
+def record_to_sample_protocolqa(record: Dict[str, Any]) -> Sample:
+    choices = record['distractors'] + [record['ideal']]
+    random.shuffle(choices)
+    correct_index = choices.index(record['ideal'])
+    correct_letter = chr(ord('A') + correct_index)
+    
+    return Sample(
+        id=f"{record.get('subtask', '')}_{record['id']}",
+        input=f"Protocol:\n{record['protocol']}\n\nQuestion:\n{record['question']}",
+        target=correct_letter,
+        choices=choices,
     )
 
 def sample_to_fewshot(sample: Sample, template: str = FEWSHOT_EXAMPLE_TEMPLATE) -> str:
@@ -55,6 +68,12 @@ def lab_bench(subset: str = "all",
     
     all_samples = []
     for current_subset in subsets_to_process:
+        
+        if current_subset in ["LitQA2", "CloningScenarios"]:
+            record_to_sample = record_to_sample_litqa_cloning
+        elif current_subset == "ProtocolQA":
+            record_to_sample = record_to_sample_protocolqa
+        
         dataset = hf_dataset(
             path="futurehouse/lab-bench",
             name=current_subset,
