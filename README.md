@@ -84,6 +84,7 @@ benchmarks:
     subset: ['gpqa_main']
     subtasks: ['Biology']
     n_shot: 4
+    runs: 10
 ```
 
 * `environment`: Set environment variables for Inspect.
