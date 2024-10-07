@@ -62,13 +62,13 @@ def mmlu(subset: str = "all",
         raise ValueError(f"Invalid split: {split}. Available splits are: {MMLU_SPLITS}")
     
     if subtasks:
-        if subtasks == 'Biology':
+        if subtasks == 'biology':
             subsets_to_process = [
                 "anatomy", "college_biology", "college_medicine", "high_school_biology", 
                 "medical_genetics", "professional_medicine", "virology"
             ]
         else:
-            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {MMLU_SUBSETS}")
+            raise ValueError(f"Invalid subtasks: {subtasks}. Available subsets are: {MMLU_SUBTASKS}")
     else:
         subsets_to_process = MMLU_SUBSETS if subset == "all" else [subset]
     
