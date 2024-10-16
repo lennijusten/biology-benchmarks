@@ -5,7 +5,7 @@ This project provides a flexible framework for evaluating Large Language Models 
 * [GPQA](https://huggingface.co/datasets/Idavidrein/gpqa)
 * [MMLU](https://huggingface.co/datasets/cais/mmlu)
 * [MMLU-Pro](https://huggingface.co/datasets/TIGER-Lab/MMLU-Pro)
-* [LAB-Bench](https://huggingface.co/datasets/futurehouse/lab-bench) (CloningScenarios and LitQA2)
+* [LAB-Bench](https://huggingface.co/datasets/futurehouse/lab-bench) (LitQA2, CloningScenarios, and ProtocolQA)
 * [WMDP](https://huggingface.co/datasets/cais/wmdp)
 * [PubMedQA](https://huggingface.co/datasets/bigbio/pubmed_qa)
 
