@@ -1,0 +1,15 @@
+environment:
+  INSPECT_LOG_DIR: ./logs/lab-bench-cloningscenarios-10run
+
+models:
+  google/gemini-1.5-pro: {}
+  openai/gpt-4o: {}
+  anthropic/claude-3-5-sonnet-20240620: {}
+  together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: {}
+
+benchmarks:
+  lab_bench:
+    enabled: true
+    split: train
+    subset: CloningScenarios
+    runs: 9

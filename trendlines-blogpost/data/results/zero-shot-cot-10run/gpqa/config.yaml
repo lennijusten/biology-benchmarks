@@ -1,0 +1,18 @@
+environment:
+  INSPECT_LOG_DIR: ./logs/gpqa-cot
+
+models:
+  openai/gpt-4o: {}
+  openai/gpt-4: {}
+  google/gemini-1.5-pro: {}
+  anthropic/claude-3-5-sonnet-20240620: {}
+  anthropic/claude-3-opus-20240229: {}
+  together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: {}
+
+benchmarks:
+  gpqa:
+    enabled: true
+    subset: gpqa_main
+    subtasks: ["Biology"]
+    cot: true
+    runs: 10

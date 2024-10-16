@@ -1,0 +1,10 @@
+environment:
+  INSPECT_LOG_DIR: ./logs/wmdp
+
+models:
+  mistral/open-mixtral-8x7b: {}
+
+benchmarks:
+  wmdp:
+    enabled: true
+    subset: 'wmdp-bio'
