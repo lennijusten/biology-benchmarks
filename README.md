@@ -1,5 +1,5 @@
 # Biology benchmarks
-This project provides a flexible framework for evaluating Large Language Models (LLMs) on various benchmarks, with a focus on biology-related tasks.  
+This project provides a flexible framework for evaluating Large Language Models (LLMs) on various multiple-choice benchmarks, with a focus on biology-related tasks.  
 
 ## Supported benchmarks:
 * [GPQA](https://huggingface.co/datasets/Idavidrein/gpqa)
