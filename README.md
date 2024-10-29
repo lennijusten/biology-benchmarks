@@ -100,7 +100,7 @@ rag:
   tavily:
     max_results: 2
 ```
-Currently supported RAG tools:
+Supported RAG tools:
 * `tavily`: Uses the [Tavily](https://tavily.com/) search API for retrieval.
 
 
