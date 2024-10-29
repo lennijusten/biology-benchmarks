@@ -1,0 +1,16 @@
+inspect_model_name,epoch_model_name,Organization,Publication date,accuracy,stderr
+together/meta-llama/Meta-Llama-3-70B-Instruct-Turbo,Llama 3-70B,Meta AI,2024-04-18,0.782,0.01848337822317885
+mistral/mistral-large-2407,Mistral Large 2,Mistral AI,2024-07-24,0.766,0.018952741564893755
+openai/gpt-4o-mini,GPT-4o mini,OpenAI,2024-07-18,0.758,0.019173085678337164
+openai/gpt-4-turbo,GPT-4 Turbo,OpenAI,2023-11-06,0.734,0.019780559675655396
+openai/gpt-4,GPT-4,OpenAI,2023-03-15,0.702,0.020475118092988954
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,2024-07-23,0.81,0.01756180041075899
+google/gemini-1.0-pro,Gemini 1.0 Pro,Google DeepMind,2023-12-06,0.704,0.02043534209189623
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,2024-02-15,0.662,0.021175665695209452
+anthropic/claude-2.0,Claude 2,Anthropic,2023-07-11,0.768,0.018896193591952035
+openai/gpt-4o,GPT-4o,OpenAI,2024-05-13,0.754,0.019279819056352458
+openai/gpt-3.5-turbo,GPT-3.5 Turbo,OpenAI,2022-11-30,0.706,0.02039509548493655
+mistral/open-mixtral-8x7b,Mixtral 8x7B,Mistral AI,2023-12-11,0.642,0.021461434862859133
+together/meta-llama/Llama-2-13b-chat-hf,Llama 2-13B,Meta AI,2023-07-18,0.662,0.021175665695209452
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,2024-06-20,0.708,0.020354375480530096
+anthropic/claude-3-opus-20240229,Claude 3 Opus,Anthropic,2024-03-04,0.756,0.01922673489361464
