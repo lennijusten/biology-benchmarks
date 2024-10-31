@@ -10,7 +10,7 @@ def fewshot_solver(get_fewshot_examples: Callable[[str], str], fewshot_template:
         examples = get_fewshot_examples(sample_input_text)
         
         # Prepare the choices string
-        choices_str = "\n\n".join([f"{chr(65+i)}. {c.value}" for i, c in enumerate(state.choices)])
+        choices_str = "\n\n".join([f"{chr(65+i)}) {c.value}" for i, c in enumerate(state.choices)])
         
         # Format the full prompt with few-shot examples
         fewshot_prompt = fewshot_template.format(
