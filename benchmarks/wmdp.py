@@ -29,7 +29,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
     )
 
 def sample_to_fewshot(sample: Sample, template: str = FEWSHOT_EXAMPLE_TEMPLATE) -> str:
-    choices_str = "\n\n".join([f"{chr(ord('A') + i)}. {choice}" for i, choice in enumerate(sample.choices)])
+    choices_str = "\n\n".join([f"{chr(ord('A') + i)}) {choice}" for i, choice in enumerate(sample.choices)])
     return template.format(question=sample.input, choices=choices_str, target=sample.target)
 
 @task
