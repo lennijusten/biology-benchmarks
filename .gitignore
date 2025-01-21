@@ -7,3 +7,4 @@ create_code_summary.py
 files_to_include.txt
 **/__pycache__/
 notes.md
+trendlines-blogpost/logs
