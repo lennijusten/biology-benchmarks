@@ -1,0 +1,142 @@
+{
+    "mmlu": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 10],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-10, 8],
+        "GPT-4o": [-10, 10],
+        "Claude 2": [-10, 10],
+        "Claude 3 Opus": [-28, 5],
+        "Claude 3.5 Sonnet": [-20, 5],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-40, -20],
+        "Llama 3.1-405B": [-40, -18],
+        "Gemini 1.0 Pro": [-10, 10],
+        "Gemini 1.5 Pro": [-40, -20],
+        "Mixtral 8x7B": [-10, 10],
+        "Mistral Large 2": [-40, -20]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "gpqa": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 6],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-10, 8],
+        "GPT-4o": [-10, 10],
+        "Claude 2": [-20, 15],
+        "Claude 3 Opus": [-50, 10],
+        "Claude 3.5 Sonnet": [-20, 5],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-20, -20],
+        "Llama 3.1-405B": [-40, -18],
+        "Gemini 1.0 Pro": [-60, 10],
+        "Gemini 1.5 Pro": [-40, -20],
+        "Mixtral 8x7B": [-10, 10],
+        "Mistral Large 2": [-40, -20]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "wmdp": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 10],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-10, 8],
+        "GPT-4o": [-30, 8],
+        "Claude 2": [-10, 10],
+        "Claude 3 Opus": [-28, 5],
+        "Claude 3.5 Sonnet": [-20, 8],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-15, -18],
+        "Llama 3.1-405B": [-40, -18],
+        "Gemini 1.0 Pro": [-10, 10],
+        "Gemini 1.5 Pro": [-40, -20],
+        "Mixtral 8x7B": [-10, 10],
+        "Mistral Large 2": [0, -20]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "lab-bench-litqa2": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 6],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-10, 8],
+        "GPT-4o": [-30, 8],
+        "Claude 2": [-20, 15],
+        "Claude 3 Opus": [-50, -18],
+        "Claude 3.5 Sonnet": [-20, 5],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-20, -20],
+        "Llama 3.1-405B": [-30, -18],
+        "Gemini 1.0 Pro": [-28, -18],
+        "Gemini 1.5 Pro": [-40, -20],
+        "Mixtral 8x7B": [-40, 8],
+        "Mistral Large 2": [-10, 6]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "lab-bench-cloningscenarios": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 6],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-10, 8],
+        "GPT-4o": [-30, 8],
+        "Claude 2": [-20, 10],
+        "Claude 3 Opus": [-40, -18],
+        "Claude 3.5 Sonnet": [-20, 8],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-20, -20],
+        "Llama 3.1-405B": [-40, -18],
+        "Gemini 1.0 Pro": [-35, -22],
+        "Gemini 1.5 Pro": [-40, 8],
+        "Mixtral 8x7B": [-40, 8],
+        "Mistral Large 2": [-15, -18]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "lab-bench-protocolqa": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 6],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-25, 8],
+        "GPT-4o": [-25, 6],
+        "Claude 2": [-20, 10],
+        "Claude 3 Opus": [-40, 8],
+        "Claude 3.5 Sonnet": [-20, 8],
+        "Llama 2-13B": [-10, 10],
+        "Llama 3-70B": [-20, -20],
+        "Llama 3.1-405B": [-40, -18],
+        "Gemini 1.0 Pro": [-35, -22],
+        "Gemini 1.5 Pro": [-30, 7],
+        "Mixtral 8x7B": [-40, 8],
+        "Mistral Large 2": [0, 5]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    },
+    "pubmedqa": {
+      "offsets": {
+        "GPT-3.5 Turbo": [-10, 6],
+        "GPT-4": [-10, 10],
+        "GPT-4 Turbo": [-50, -18],
+        "GPT-4o": [-8, 2],
+        "Claude 2": [-20, -18],
+        "Claude 3 Opus": [-40, -18],
+        "Claude 3.5 Sonnet": [-30, -20],
+        "Llama 2-13B": [-20, -18],
+        "Llama 3-70B": [-20, 10],
+        "Llama 3.1-405B": [-40, 8],
+        "Gemini 1.0 Pro": [-50, -18],
+        "Gemini 1.5 Pro": [-20, -20],
+        "Mixtral 8x7B": [-30, -18],
+        "Mistral Large 2": [-40, -18]
+      },
+      "xlim": [0.2, 1.0],
+      "ylim": [0.2, 1.0]
+    }
+  }
