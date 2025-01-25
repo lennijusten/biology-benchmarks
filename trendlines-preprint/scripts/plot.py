@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import pandas as pd
+import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.colors as mcolors
@@ -24,11 +25,11 @@ def load_plot_config(path: str) -> dict:
     with open(path, 'r') as f:
         return json.load(f)
 
-def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dict):
+def plot_zero_shot_trendlines(df: pd.DataFrame, plot_config: dict, color_map: dict, ax):
     """Plot zero-shot performance trends by organization."""
     
     # Filter for zero-shot data
-    zshot_df = df[(df['prompt_schema'] == 'zero_shot') & (df['inspect_model_name'] != 'anthropic/claude-3-5-sonnet-20240620')]
+    zshot_df = df[df['prompt_schema'] == 'zero_shot']
     # Exclude specific models
     exclude_models = ['anthropic/claude-3-5-sonnet-20240620']
     zshot_df = zshot_df[~zshot_df['inspect_model_name'].isin(exclude_models)]
@@ -44,11 +45,6 @@ def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dic
         for _, row in dropped_rows.iterrows():
             print(f"Organization: {row['epoch_organization']}, Model: {row['epoch_model_name']}, Num results: {row['num_results']}")
     model_stats = model_stats[model_stats['num_results'] == 10]
-    
-    # Create color map for organizations
-    organizations = sorted(model_stats['epoch_organization'].unique())
-    color_palette = sns.color_palette("deep", len(organizations))
-    color_map = dict(zip(organizations, color_palette))
     
     # Get manual offsets and plot limits
     manual_offsets = plot_config['offsets']
@@ -81,12 +77,8 @@ def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dic
                 'label': 'Random guess'
             }
     
-    # Plot data
-    plt.figure(figsize=(10, 6))
-    ax = plt.gca()
-    
     for org in color_map.keys():
-        org_data = model_stats[model_stats['epoch_organization'] == org]
+        org_data = model_stats[model_stats['epoch_organization'] == org].sort_values(by='epoch_model_publication_date')
         if not org_data.empty:
             ax.scatter(org_data['epoch_model_publication_date'], org_data['mean'],
                       label=org, color=color_map[org], s=80, alpha=0.7)
@@ -131,10 +123,10 @@ def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dic
     
     # Create legend with sections
     handles, labels = ax.get_legend_handles_labels()
-    org_handles = handles[:len(color_map)]
-    org_labels = labels[:len(color_map)]
-    baseline_handles = handles[len(color_map):]
-    baseline_labels = labels[len(color_map):]
+    org_handles = [handle for handle, label in zip(handles, labels) if label in color_map.keys()]
+    org_labels = [label for label in labels if label in color_map.keys()]
+    baseline_handles = [handle for handle, label in zip(handles, labels) if label in baselines.keys()]
+    baseline_labels = [label for label in labels if label in baselines.keys()]
     
     legend_elements = [
         plt.Line2D([0], [0], color='w', alpha=0, label='Organization'),
@@ -158,15 +150,107 @@ def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dic
             text.set_fontsize(12)
     
     plt.tight_layout()
-    plt.show()
-    plt.pause(1)
-    pass
     
 
-def plot_top_models_by_promt_schema(df: pd.DataFrame, benchmark: str, plot_config: dict):
-    pass
+def plot_top_models_by_promt_schema(df: pd.DataFrame, plot_config: dict, ax):
+    """Plot model performance comparison by prompt schema."""
+    
+    # Filter for selected models and get data for each schema
+    top_models = ['anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o', 'google/gemini-1.5-pro', 'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo']
+    df_filtered = df[df['inspect_model_name'].isin(top_models)]
+    
+    zero_shot_df = df_filtered[df_filtered['prompt_schema'] == 'zero_shot']
+    five_shot_df = df_filtered[df_filtered['prompt_schema'] == 'five_shot']
+    zero_shot_cot_df = df_filtered[df_filtered['prompt_schema'] == 'zero_shot_cot']
+    
+    # Colors for different conditions
+    colors = {
+        'Zero-shot': '#5ab4ac',
+        'Five-shot': '#f6e8c3',
+        'Zero-shot CoT': '#d8b365'
+    }
+    
+    dot_colors = {
+        'Zero-shot': '#387b75',
+        'Five-shot': '#c4b68c',
+        'Zero-shot CoT': '#8e6c24'
+    }
+    
+    # Prepare combined dataframe
+    zero_shot_df['condition'] = 'Zero-shot'
+    combined_dfs = [zero_shot_df]
+    
+    if not five_shot_df.empty:
+        five_shot_df['condition'] = 'Five-shot'
+        combined_dfs.append(five_shot_df)
+    
+    if not zero_shot_cot_df.empty:
+        zero_shot_cot_df['condition'] = 'Zero-shot CoT'
+        combined_dfs.append(zero_shot_cot_df)
+    
+    combined_df = pd.concat(combined_dfs)
+    num_conditions = len(combined_dfs)
+    
+    # Sort models by median zero-shot accuracy
+    model_order = zero_shot_df.groupby('epoch_model_name')['accuracy'].median().sort_values(ascending=True).index
+    
+    # Create box plot
+    sns.boxplot(x='accuracy', y='epoch_model_name', hue='condition', 
+                data=combined_df, order=model_order,
+                palette=colors, width=0.7, showfliers=False, dodge=True)
+    
+    # Add individual points
+    conditions = list(colors.keys())[:num_conditions]
+    box_width = 0.7 / num_conditions
+    
+    for i, condition in enumerate(conditions):
+        data = combined_df[combined_df['condition'] == condition]
+        color = dot_colors[condition]
+        
+        y_offset = -0.25 + (0.5 * i / (num_conditions - 1)) if num_conditions > 1 else 0
+        
+        for j, model in enumerate(model_order):
+            model_data = data[data['epoch_model_name'] == model]
+            y_positions = np.random.normal(j + y_offset, 0.05, len(model_data))
+            ax.scatter(model_data['accuracy'], y_positions,
+                      color=color, alpha=0.7, s=15, zorder=10)
+    
+    # Customize plot
+    ax.set_xlabel('Accuracy (0-shot, 10 runs)', fontsize=14)
+    ax.set_ylabel('')
+    ax.set_xlim(plot_config['xlim'])
+    
+    # Add grid
+    ax.grid(True, linestyle='--', alpha=0.7)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    
+    # Add baselines
+    baseline_dict = df.iloc[0]['baselines']
+    if baseline_dict:
+        if 'expert' in baseline_dict and baseline_dict['expert'] is not None:
+            ax.axvline(x=baseline_dict['expert'], color='#092327',
+                      linestyle='--', alpha=0.7, label='Expert accuracy')
+        if 'non_expert' in baseline_dict and baseline_dict['non_expert'] is not None:
+            ax.axvline(x=baseline_dict['non_expert'], color='#0b5351',
+                      linestyle='-.', alpha=0.7, label='Non-expert accuracy')
+        if 'random' in baseline_dict and baseline_dict['random'] is not None:
+            ax.axvline(x=baseline_dict['random'], color='#00a9a5',
+                      linestyle=':', alpha=0.7, label='Random guess')
+    
+    # Customize legend
+    if num_conditions > 1:
+        handles, labels = ax.get_legend_handles_labels()
+        legend = ax.legend(handles[:num_conditions], labels[:num_conditions],
+                         title='Condition', fontsize=10, loc='best')
+        legend.get_frame().set_alpha(1)
+        plt.setp(legend.get_title(), fontsize=12, fontweight='bold')
+    else:
+        ax.get_legend().remove()
+    
+    plt.tight_layout()
 
-def plot_benchmark(df: pd.DataFrame, benchmark: str, plot_config: dict, output_dir: Path):
+def plot_benchmark(df: pd.DataFrame, plot_config: dict, output_dir: Path):
     """Plot benchmark results and save to output directory."""
 
     # Set up the plot style
@@ -182,8 +266,8 @@ def plot_benchmark(df: pd.DataFrame, benchmark: str, plot_config: dict, output_d
     color_palette = sns.color_palette("deep", len(organizations))
     color_map = dict(zip(organizations, color_palette))
 
-    plot_zero_shot_trendlines(df, benchmark, plot_config)
-    plot_top_models_by_promt_schema(df, benchmark, plot_config)
+    plot_zero_shot_trendlines(df, plot_config, color_map, ax1)
+    plot_top_models_by_promt_schema(df, plot_config, ax2)
 
     fig.suptitle(f"Model Performance on {plot_config['name']} Benchmark", fontsize=16, fontweight='bold')
     plt.tight_layout()
@@ -209,7 +293,7 @@ def main():
         if benchmark_df.empty:
             continue
 
-        plot_benchmark(benchmark_df, benchmark, plot_config[benchmark], args.output)
+        plot_benchmark(benchmark_df, plot_config[benchmark], args.output)
 
 if __name__ == '__main__':
     main()
