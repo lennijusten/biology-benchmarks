@@ -25,13 +25,17 @@ def load_plot_config(path: str) -> dict:
     with open(path, 'r') as f:
         return json.load(f)
 
-def plot_zero_shot_trendlines(df: pd.DataFrame, plot_config: dict, color_map: dict, ax):
+def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dict, color_map: dict, ax):
     """Plot zero-shot performance trends by organization."""
     
     # Filter for zero-shot data
     zshot_df = df[df['prompt_schema'] == 'zero_shot']
     # Exclude specific models
     exclude_models = ['anthropic/claude-3-5-sonnet-20240620']
+
+    if benchmark == 'lab-bench-cloningscenarios':
+        exclude_models.append('google/gemini-1.0-pro')
+
     zshot_df = zshot_df[~zshot_df['inspect_model_name'].isin(exclude_models)]
     
     # Calculate mean and std of accuracy for each model
@@ -253,7 +257,7 @@ def plot_top_models_by_promt_schema(df: pd.DataFrame, plot_config: dict, ax):
     
     plt.tight_layout()
 
-def plot_benchmark(df: pd.DataFrame, plot_config: dict, output_dir: Path):
+def plot_benchmark(df: pd.DataFrame, benchmark: str, plot_config: dict, output_dir: Path):
     """Plot benchmark results and save to output directory."""
 
     # Set up the plot style
@@ -269,7 +273,7 @@ def plot_benchmark(df: pd.DataFrame, plot_config: dict, output_dir: Path):
     color_palette = sns.color_palette("deep", len(organizations))
     color_map = dict(zip(organizations, color_palette))
 
-    plot_zero_shot_trendlines(df, plot_config, color_map, ax1)
+    plot_zero_shot_trendlines(df, benchmark, plot_config, color_map, ax1)
     plot_top_models_by_promt_schema(df, plot_config, ax2)
 
     fig.suptitle(f"Model Performance on {plot_config['name']} Benchmark", fontsize=16, fontweight='bold')
@@ -291,14 +295,13 @@ def main():
     df = load_plot_data(args.input_csv)
     plot_config = load_plot_config(args.plot_config)
 
-    # for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa']:
-    for benchmark in ['lab-bench-litqa2']:
+    for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa']:
         print(f"Plotting {benchmark} benchmark...")
         benchmark_df = df[df['benchmark'] == benchmark]
         if benchmark_df.empty:
             continue
 
-        plot_benchmark(benchmark_df, plot_config[benchmark], args.output)
+        plot_benchmark(benchmark_df, benchmark, plot_config[benchmark], args.output)
 
 if __name__ == '__main__':
     main()

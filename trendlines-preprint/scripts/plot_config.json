@@ -88,39 +88,39 @@
     "offsets": {
       "GPT-3.5 Turbo": [-10, 6],
       "GPT-4": [-10, 10],
-      "GPT-4 Turbo": [-10, 8],
-      "GPT-4o": [-30, 8],
+      "GPT-4 Turbo": [-30, -20],
+      "GPT-4o": [-20, 10],
       "Claude 2": [-20, 10],
-      "Claude 3 Opus": [-40, -18],
+      "Claude 3 Opus": [-40, 9],
       "Claude 3.5 Sonnet": [-20, 8],
       "Llama 2-13B": [-10, 10],
       "Llama 3-70B": [-20, -20],
-      "Llama 3.1-405B": [-40, -18],
+      "Llama 3.1-405B": [5, -18],
       "Gemini 1.0 Pro": [-35, -22],
-      "Gemini 1.5 Pro": [-40, 8],
+      "Gemini 1.5 Pro": [-40, -20],
       "Mixtral 8x7B": [-40, 8],
-      "Mistral Large 2": [-15, -18]
+      "Mistral Large 2": [5, -18]
     },
     "xlim": [0.2, 1.0],
-    "ylim": [0.2, 1.0]
+    "ylim": [0, 1.0]
   },
   "lab-bench-protocolqa": {
     "name": "ProtocolQA",
     "offsets": {
-      "GPT-3.5 Turbo": [-10, 6],
-      "GPT-4": [-10, 10],
-      "GPT-4 Turbo": [-25, 8],
-      "GPT-4o": [-25, 6],
-      "Claude 2": [-20, 10],
-      "Claude 3 Opus": [-40, 8],
-      "Claude 3.5 Sonnet": [-20, 8],
+      "GPT-3.5 Turbo": [-10, 8],
+      "GPT-4": [-33, 8],
+      "GPT-4 Turbo": [-63, 5],
+      "GPT-4o": [-25, 13],
+      "Claude 2": [-20, 15],
+      "Claude 3 Opus": [-74, 5],
+      "Claude 3.5 Sonnet": [5, 5],
       "Llama 2-13B": [-10, 10],
-      "Llama 3-70B": [-20, -20],
-      "Llama 3.1-405B": [-40, -18],
+      "Llama 3-70B": [-20, -29],
+      "Llama 3.1-405B": [5, -18],
       "Gemini 1.0 Pro": [-35, -22],
-      "Gemini 1.5 Pro": [-30, 7],
-      "Mixtral 8x7B": [-40, 8],
-      "Mistral Large 2": [0, 5]
+      "Gemini 1.5 Pro": [-78, -5],
+      "Mixtral 8x7B": [-50, 15],
+      "Mistral Large 2": [5, 5]
     },
     "xlim": [0.2, 1.0],
     "ylim": [0.2, 1.0]
@@ -130,18 +130,18 @@
     "offsets": {
       "GPT-3.5 Turbo": [-10, 6],
       "GPT-4": [-10, 10],
-      "GPT-4 Turbo": [-50, -18],
-      "GPT-4o": [-8, 2],
+      "GPT-4 Turbo": [-40, -18],
+      "GPT-4o": [-16, -20],
       "Claude 2": [-20, -18],
       "Claude 3 Opus": [-40, -18],
-      "Claude 3.5 Sonnet": [-30, -20],
+      "Claude 3.5 Sonnet": [5, 2],
       "Llama 2-13B": [-20, -18],
       "Llama 3-70B": [-20, 10],
-      "Llama 3.1-405B": [-40, 8],
+      "Llama 3.1-405B": [-20, 8],
       "Gemini 1.0 Pro": [-50, -18],
-      "Gemini 1.5 Pro": [-20, -20],
+      "Gemini 1.5 Pro": [5, -15],
       "Mixtral 8x7B": [-30, -18],
-      "Mistral Large 2": [-40, -18]
+      "Mistral Large 2": [5, -18]
     },
     "xlim": [0.2, 1.0],
     "ylim": [0.2, 1.0]
