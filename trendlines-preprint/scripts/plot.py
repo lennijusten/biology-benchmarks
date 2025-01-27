@@ -177,22 +177,25 @@ def plot_top_models_by_promt_schema(df: pd.DataFrame, plot_config: dict, ax):
     }
     
     # Prepare combined dataframe
-    zero_shot_df['condition'] = 'Zero-shot'
+    zero_shot_df = zero_shot_df.copy()
+    zero_shot_df.loc[:, 'condition'] = 'Zero-shot'
     combined_dfs = [zero_shot_df]
-    
+
     if not five_shot_df.empty:
-        five_shot_df['condition'] = 'Five-shot'
+        five_shot_df = five_shot_df.copy()
+        five_shot_df.loc[:, 'condition'] = 'Five-shot'
         combined_dfs.append(five_shot_df)
-    
+
     if not zero_shot_cot_df.empty:
-        zero_shot_cot_df['condition'] = 'Zero-shot CoT'
+        zero_shot_cot_df = zero_shot_cot_df.copy()
+        zero_shot_cot_df.loc[:, 'condition'] = 'Zero-shot CoT'
         combined_dfs.append(zero_shot_cot_df)
     
     combined_df = pd.concat(combined_dfs)
     num_conditions = len(combined_dfs)
     
     # Sort models by median zero-shot accuracy
-    model_order = zero_shot_df.groupby('epoch_model_name')['accuracy'].median().sort_values(ascending=True).index
+    model_order = zero_shot_df.groupby('epoch_model_name')['accuracy'].median().sort_values(ascending=False).index
     
     # Create box plot
     sns.boxplot(x='accuracy', y='epoch_model_name', hue='condition', 
@@ -288,7 +291,9 @@ def main():
     df = load_plot_data(args.input_csv)
     plot_config = load_plot_config(args.plot_config)
 
-    for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa']:
+    # for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa']:
+    for benchmark in ['lab-bench-litqa2']:
+        print(f"Plotting {benchmark} benchmark...")
         benchmark_df = df[df['benchmark'] == benchmark]
         if benchmark_df.empty:
             continue
