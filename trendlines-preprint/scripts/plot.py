@@ -112,7 +112,7 @@ def plot_zero_shot_trendlines(df: pd.DataFrame, benchmark: str, plot_config: dic
     
     # Customize plot
     ax.set_xlabel("Model publication date", fontsize=14)
-    ax.set_ylabel("Accuracy (0-shot, 1 run)", fontsize=14)
+    ax.set_ylabel("Accuracy (0-shot, 10 run)", fontsize=14)
     ax.set_ylim(ylim)
     
     # Format x-axis
@@ -223,7 +223,7 @@ def plot_top_models_by_promt_schema(df: pd.DataFrame, plot_config: dict, ax):
                       color=color, alpha=0.7, s=15, zorder=10)
     
     # Customize plot
-    ax.set_xlabel('Accuracy (0-shot, 10 runs)', fontsize=14)
+    ax.set_xlabel('Accuracy (10 runs)', fontsize=14)
     ax.set_ylabel('')
     ax.set_xlim(plot_config['xlim'])
     
