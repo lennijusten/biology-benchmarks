@@ -103,7 +103,7 @@ def main():
     args = parser.parse_args()
     
     if not args.output:
-        args.output = args.logs_dir / ' combined_results.csv'
+        args.output = args.logs_dir / 'combined_results.csv'
         
     # Load and process data
     final_df = collect_result_csvs(args.logs_dir)
