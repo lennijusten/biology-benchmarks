@@ -11,12 +11,12 @@ def load_metadata(notable_file: str, large_scale_file: str, models_data_file: st
     large_scale_df = pd.read_csv(large_scale_file)
     
     epoch_df = pd.concat([notable_df, large_scale_df], ignore_index=True)
-    epoch_df = epoch_df.drop_duplicates(subset='System', keep='first')
-    epoch_df = epoch_df[['System', 'Organization', 'Publication date']]
+    epoch_df = epoch_df.drop_duplicates(subset='Model', keep='first')
+    epoch_df = epoch_df[['Model', 'Organization', 'Publication date']]
     
     models_df = pd.read_csv(models_data_file, sep='\t')
     models_df = models_df[['inspect_model_name', 'epoch_model_name']]
-    return models_df.merge(epoch_df, left_on='epoch_model_name', right_on='System', how='left')
+    return models_df.merge(epoch_df, left_on='epoch_model_name', right_on='Model', how='left')
 
 def get_benchmark_baselines():
     """Get benchmark baselines."""
