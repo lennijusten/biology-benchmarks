@@ -24,7 +24,7 @@ def process_log_file(filepath: str, prompt_schema: str =None, is_cot: bool = Fal
             log = json.load(f)
 
     if log['status'] != "success":
-        print(f"Error processing {filepath}: {log['status']}")
+        print(f"Error processing {filepath}. Expected status 'success' but got '{log['status']}'")
         return None
     
     # If the prompt schema is CoT scoring use fixed scoring
