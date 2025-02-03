@@ -17,6 +17,13 @@ def load_plot_data(path: str) -> pd.DataFrame:
             'baselines': eval
         }
     )
+
+    # Update organization name for specific models
+    # This currently only applies to Gemini 2.0 Flash and is presumably an update from EpochAI
+    # that considers the merger between DeepMind and Google Brain
+    df.loc[df['epoch_organization'] == 'Google DeepMind,Google', 'epoch_organization'] = 'Google DeepMind'
+
+    df = df.dropna(subset=['epoch_organization'])
     return df
 
 def load_plot_config(path: str) -> dict:
