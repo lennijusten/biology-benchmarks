@@ -172,8 +172,8 @@ def vct(mode: str = "mc",
     plan = []
     if cot:
         plan.append(multiple_choice(
-            template=MULTIPLE_CHOICE_TEMPLATE_COT,
-            multiple_correct=(mode == "mr")
+            template=MULTIPLE_ANSWER_TEMPLATE_COT if is_multiple_response else MULTIPLE_CHOICE_TEMPLATE_COT,
+            multiple_correct=is_multiple_response
         ))
     elif n_shot > 0:
         if n_shot > len(dataset) - 1:
@@ -189,18 +189,15 @@ def vct(mode: str = "mc",
             get_fewshot_examples, 
             fewshot_template=MULTIPLE_CHOICE_TEMPLATE_FEWSHOT
         ))
-        
         plan.append(multiple_choice(
             template=MULTIPLE_ANSWER_TEMPLATE if is_multiple_response else SINGLE_ANSWER_TEMPLATE,
             multiple_correct=is_multiple_response
         ))
-
     else:
         plan.append(multiple_choice(
             template=MULTIPLE_ANSWER_TEMPLATE if is_multiple_response else SINGLE_ANSWER_TEMPLATE,
             multiple_correct=is_multiple_response
         ))
-
     return Task(
         dataset=dataset,
         plan=plan,

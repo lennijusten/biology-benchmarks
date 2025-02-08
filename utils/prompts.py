@@ -31,7 +31,7 @@ Answer the following multiple choice question. The last line of your response sh
 """.strip()
 
 MULTIPLE_ANSWER_TEMPLATE_COT = r"""
-Answer the following multiple choice question where multiple answers may be correct. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of {letters}. Before answering, reason in a step-by-step manner as to get the right answer.
+Answer the following multiple choice question where multiple answers may be correct. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTERS is one or more of {letters}. Before answering, reason in a step-by-step manner as to get the right answer.
 
 {question}
 
