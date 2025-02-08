@@ -165,6 +165,8 @@ def vct(mode: str = "mc",
         dataset = MemoryDataset(sampled_data)
     else:
         dataset = MemoryDataset(all_samples)
+
+    is_multiple_response = mode == "mr"
     
     # Build plan based on configuration
     plan = []
@@ -187,21 +189,17 @@ def vct(mode: str = "mc",
             get_fewshot_examples, 
             fewshot_template=MULTIPLE_CHOICE_TEMPLATE_FEWSHOT
         ))
+        
         plan.append(multiple_choice(
-            template=SINGLE_ANSWER_TEMPLATE,
-            multiple_correct=(mode == "mr")
+            template=MULTIPLE_ANSWER_TEMPLATE if is_multiple_response else SINGLE_ANSWER_TEMPLATE,
+            multiple_correct=is_multiple_response
         ))
+
     else:
-        if mode == "mr":
-            plan.append(multiple_choice(
-                template=MULTIPLE_ANSWER_TEMPLATE,
-                multiple_correct=True
-            ))
-        else:
-            plan.append(multiple_choice(
-                template=SINGLE_ANSWER_TEMPLATE,
-                multiple_correct=False
-            ))
+        plan.append(multiple_choice(
+            template=MULTIPLE_ANSWER_TEMPLATE if is_multiple_response else SINGLE_ANSWER_TEMPLATE,
+            multiple_correct=is_multiple_response
+        ))
 
     return Task(
         dataset=dataset,
