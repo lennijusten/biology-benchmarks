@@ -167,7 +167,7 @@ def plot_top_models_by_promt_schema(df: pd.DataFrame, plot_config: dict, ax):
     """Plot model performance comparison by prompt schema."""
     
     # Filter for selected models and get data for each schema
-    top_models = ['anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o', 'google/gemini-1.5-pro', 'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo']
+    top_models = ['anthropic/claude-3-5-sonnet-20241022', 'openai/gpt-4o', 'openai/gpt-4o-2024-08-06', 'google/gemini-1.5-pro', 'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo']
     df_filtered = df[df['inspect_model_name'].isin(top_models)]
     
     zero_shot_df = df_filtered[df_filtered['prompt_schema'] == 'zero_shot']
@@ -302,7 +302,7 @@ def main():
     df = load_plot_data(args.input_csv)
     plot_config = load_plot_config(args.plot_config)
 
-    for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa']:
+    for benchmark in ['mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'pubmedqa', 'vct']:
         print(f"Plotting {benchmark} benchmark...")
         benchmark_df = df[df['benchmark'] == benchmark]
         if benchmark_df.empty:

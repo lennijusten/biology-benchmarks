@@ -145,5 +145,26 @@
     },
     "xlim": [0.2, 1.0],
     "ylim": [0.2, 1.0]
+  },
+  "vct": {
+    "name": "Virology Capabilities Assessment (VCT)",
+    "offsets": {
+      "GPT-3.5 Turbo": [-10, 6],
+      "GPT-4": [-10, 10],
+      "GPT-4 Turbo": [-40, -18],
+      "GPT-4o": [-16, -20],
+      "Claude 2": [-20, -18],
+      "Claude 3 Opus": [-40, -18],
+      "Claude 3.5 Sonnet": [5, 2],
+      "Llama 2-13B": [-20, -18],
+      "Llama 3-70B": [-20, 10],
+      "Llama 3.1-405B": [-20, 8],
+      "Gemini 1.0 Pro": [-50, -18],
+      "Gemini 1.5 Pro": [5, -15],
+      "Mixtral 8x7B": [-30, -18],
+      "Mistral Large 2": [5, -18]
+    },
+    "xlim": [0, 1.0],
+    "ylim": [0, 1.0]
   }
 }
