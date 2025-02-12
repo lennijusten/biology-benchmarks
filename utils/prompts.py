@@ -11,6 +11,7 @@ Answer the following multiple choice question. The entire content of your respon
 # Copied from Inspect implementation: https://github.com/UKGovernmentBEIS/inspect_ai/blob/main/src/inspect_ai/solver/_multiple_choice.py
 MULTIPLE_ANSWER_TEMPLATE = r"""
 Answer the following multiple choice question where multiple answers may be correct. The entire content of your response should be of the following format: 'ANSWER: $LETTERS' (without quotes) where LETTERS is one or more of {letters}.
+
 {question}
 {choices}
 """.strip()
@@ -23,6 +24,14 @@ Before answering, reason in a step-by-step manner as to get the right answer. Pr
 
 MULTIPLE_CHOICE_TEMPLATE_COT = r"""
 Answer the following multiple choice question. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTER is one of {letters}. Before answering, reason in a step-by-step manner as to get the right answer.
+
+{question}
+
+{choices}
+""".strip()
+
+MULTIPLE_ANSWER_TEMPLATE_COT = r"""
+Answer the following multiple choice question where multiple answers may be correct. The last line of your response should be of the following format: 'ANSWER: $LETTER' (without quotes) where LETTERS is one or more of {letters}. Before answering, reason in a step-by-step manner as to get the right answer.
 
 {question}
 

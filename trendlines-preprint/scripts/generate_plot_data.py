@@ -35,6 +35,7 @@ def get_benchmark_baselines():
         'lab-bench-cloningscenarios': {'expert': 0.60, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'CloningScenarios', 'train')},
         'lab-bench-protocolqa': {'expert': 0.79, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'ProtocolQA', 'train')},
         'pubmedqa': {'expert': 0.78, 'non_expert': None, 'random': 0.333},
+        'vct': {'expert': None, 'non_expert': None, 'random': None},
     }
     return baselines
 

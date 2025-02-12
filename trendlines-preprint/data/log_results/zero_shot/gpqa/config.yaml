@@ -2,8 +2,11 @@ environment:
   INSPECT_LOG_DIR: ./trendlines-preprint/logs/zero_shot/gpqa
 
 models:
+  google/gemini-2.0-flash-exp: {}
   google/gemini-1.5-pro: {}
   google/gemini-1.0-pro: {}
+  openai/o3-mini-2025-01-31: {}
+  openai/o1-2024-12-17: {}
   openai/gpt-4o: {}
   openai/gpt-4: {}
   openai/gpt-4-turbo: {}
@@ -16,6 +19,7 @@ models:
   together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: {}
   together/meta-llama/Meta-Llama-3-70B-Instruct-Turbo: {}
   together/meta-llama/Llama-2-13b-chat-hf: {}
+  together/deepseek-ai/DeepSeek-V3: {}
 
 benchmarks:
   gpqa:
