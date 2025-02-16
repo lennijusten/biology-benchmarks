@@ -150,7 +150,7 @@ def vct(mode: str = "mc",
     
     # Load data
     data_path = "vct_data/vct_322Q-shared-set_2025-02-05.jsonl"
-    image_folder = "vct_data/vct_data/images"
+    image_folder = "../vct_data/images"
     
     # Convert records to samples
     record_to_sample = record_to_sample_mc if mode == "mc" else record_to_sample_mr
