@@ -64,8 +64,20 @@ def compute_cot_accuracy(samples: list) -> tuple[float, float]:
         
         if extracted_answer:
             # Compare extracted answer with target
-            target = sample['target'].strip().upper()
-            correct_count += (extracted_answer == target)
+            if isinstance(sample['target'], list):
+                # For multiple-response questions
+                target = sorted(sample['target'])
+                extracted_answer_list = sorted([i.strip().upper() for i in extracted_answer.split(',')])
+
+                if len(extracted_answer_list) == 1:
+                    # Sometimes answers don't have commas
+                    extracted_answer_list = sorted(i.upper() for i in list(extracted_answer_list[0]))
+
+                correct_count += (extracted_answer_list == target)
+            else:
+                target = sample['target'].strip().upper()
+                correct_count += (extracted_answer == target)
+
         total_count += 1
     
     # Compute accuracy and stderr
