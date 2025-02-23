@@ -39,7 +39,7 @@ def get_benchmark_baselines():
     }
     return baselines
 
-def collect_result_csvs(logs_dir: Path) -> pd.DataFrame:
+def combine_result_csvs(logs_dir: Path) -> pd.DataFrame:
     """Collect all results.csv files and combine them into a final dataframe."""
     dfs = []
     
@@ -67,7 +67,7 @@ def collect_result_csvs(logs_dir: Path) -> pd.DataFrame:
         
     return pd.concat(dfs, ignore_index=True)
 
-def process_results(df: pd.DataFrame, model_metadata: pd.DataFrame) -> pd.DataFrame:
+def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame) -> pd.DataFrame:
     """Process and combine results with metadata."""
     df = pd.merge(df, model_metadata, on='inspect_model_name', how='left')
     baselines = get_benchmark_baselines()
@@ -89,6 +89,89 @@ def process_results(df: pd.DataFrame, model_metadata: pd.DataFrame) -> pd.DataFr
     })
     return df[column_order]
 
+def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Create summary statistics by grouping runs across model/eval/prompt combinations.
+    
+    Args:
+        df: DataFrame with individual run results
+        
+    Returns:
+        DataFrame with one row per unique combination containing summary statistics
+    """
+    # Group by model, task, and prompt schema
+    grouped = df.groupby([
+        'inspect_model_name',
+        'benchmark',
+        'prompt_schema',
+    ])
+
+    stats = []
+    for name, group in grouped:
+        # Skip if any key values are missing
+        if pd.isna(name):
+            continue
+            
+        # Construct path name
+        model = name[0].split('/')[-1]  # Take last part of model name
+        benchmark = name[1]
+        prompt = name[2] if name[2] else None
+        path = f"{prompt}/{benchmark}/{model}"
+        
+        # Get list of filenames
+        filenames = sorted(group['filename'].tolist())
+        
+        # Verify all metadata matches within group
+        total_samples = group['total_samples'].iloc[0]
+        if not (group['total_samples'] == total_samples).all():
+            print(f"Warning: Inconsistent total_samples in {path}")
+
+        # Get task args
+        if len(group['task_args'].unique()) == 1:
+            task_args = group['task_args'].iloc[0]
+        else:
+            # For runs with old task arg format, select the newer format
+            for i in group['task_args'].unique():
+                if len(group['task_args'].loc[group['task_args'] == i]) > 1:
+                    task_args = i 
+            
+        # Calculate statistics
+        mean_accuracy = group['accuracy'].mean()
+        std_accuracy = group['accuracy'].std()
+        
+        stats.append({
+            'path': path,
+            'inspect_model_name': name[0],
+            'benchmark': name[1], 
+            'task_args': task_args,
+            'prompt_schema': name[2],
+            'total_samples': total_samples,
+            'mean_accuracy': mean_accuracy,
+            'std_accuracy': std_accuracy,
+            'num_runs': len(group),
+            'filenames': filenames
+        })
+    
+    # Convert to DataFrame and sort
+    stats_df = pd.DataFrame(stats)
+    stats_df = stats_df.sort_values(['inspect_model_name', 'benchmark', 'prompt_schema'])
+    
+    # Order columns
+    column_order = [
+        'path',
+        'inspect_model_name', 
+        'benchmark',
+        'task_args',
+        'prompt_schema',
+        'total_samples',
+        'mean_accuracy',
+        'std_accuracy', 
+        'num_runs',
+        'filenames'
+    ]
+    
+    return stats_df[column_order]
+
 def main():
     parser = argparse.ArgumentParser(description='Process and combine model evaluation results')
     parser.add_argument('logs_dir', type=Path, help='Path to logs directory')
@@ -107,14 +190,16 @@ def main():
         args.output = args.logs_dir / 'combined_results.csv'
         
     # Load and process data
-    final_df = collect_result_csvs(args.logs_dir)
+    runs_df = combine_result_csvs(args.logs_dir)
     model_metadata = load_metadata(args.notable, args.large_scale, args.models_data)
-    final_df = process_results(final_df, model_metadata)
+    runs_df = process_combined_results(runs_df, model_metadata)
+    stats_df = create_stats_df(runs_df)
     
     # Save results
-    final_df.to_csv(args.output, index=False)
+    runs_df.to_csv(args.output, index=False)
+    stats_df.to_csv(args.output.with_name('summary_stats.csv'), index=False)
     print(f"Created final CSV at {args.output}")
-    print(f"Total rows: {len(final_df)}")
+    print(f"Total rows: {len(runs_df)}")
 
 if __name__ == '__main__':
     main()
