@@ -38,7 +38,8 @@ def main(input_csv, output_file):
         'anthropic/claude-3-5-sonnet-20241022',
         'google/gemini-1.5-pro',
         'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo',
-        'openai/gpt-4o'
+        'openai/gpt-4o',
+        'openai/gpt-4o-2024-08-06'
     ]
     df = df[df['inspect_model_name'].isin(models_of_interest)]
     
@@ -55,7 +56,7 @@ def main(input_csv, output_file):
     }
     df['benchmark_display'] = df['benchmark'].map(benchmark_mapping)
     
-    # Pivot: each row is (benchmark, model), columns for zero_shot, five_shot, etc.
+    # Pivot table 
     pivoted = df.pivot_table(
         index=['benchmark', 'inspect_model_name', 'epoch_model_name', 'benchmark_display'],
         columns='prompt_schema',
@@ -63,7 +64,7 @@ def main(input_csv, output_file):
     ).reset_index()
     pivoted.columns = ['_'.join(col).strip('_') for col in pivoted.columns.values]
     
-    # Prepare columns for ratio + CI
+    # Compute fold differences and CI
     pivoted['ratio_five_shot'] = np.nan
     pivoted['ratio_cot'] = np.nan
     pivoted['ci_low_five_shot'] = np.nan
@@ -71,19 +72,18 @@ def main(input_csv, output_file):
     pivoted['ci_low_cot'] = np.nan
     pivoted['ci_high_cot'] = np.nan
     
-    # Compute fold differences
     for i, row in pivoted.iterrows():
-        # Zero-shot
+        # Zero-shot values
         mz = row.get('mean_accuracy_zero_shot', np.nan)
         sz = row.get('std_accuracy_zero_shot', np.nan)
         nz = row.get('num_runs_zero_shot', np.nan)
         
-        # Five-shot
+        # Five-shot values
         mf = row.get('mean_accuracy_five_shot', np.nan)
         sf = row.get('std_accuracy_five_shot', np.nan)
         nf = row.get('num_runs_five_shot', np.nan)
         
-        # CoT
+        # CoT values
         mc = row.get('mean_accuracy_zero_shot_cot', np.nan)
         sc = row.get('std_accuracy_zero_shot_cot', np.nan)
         nc = row.get('num_runs_zero_shot_cot', np.nan)
@@ -102,15 +102,18 @@ def main(input_csv, output_file):
             pivoted.loc[i, 'ci_low_cot'] = ci_low
             pivoted.loc[i, 'ci_high_cot'] = ci_high
     
-    # Set up the plot style
+    # Set style
     plt.rcParams['font.family'] = 'Arial'
     plt.rcParams['font.size'] = 12
     sns.set_style("whitegrid")
     
-    # 2×2 grid, one subplot per model
-    unique_models = pivoted['inspect_model_name'].unique()
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10), sharex=True)
-    axes = axes.flatten()
+    # Create figure with a custom layout that groups panels by model
+    fig = plt.figure(figsize=(16, 10))
+    
+    # Create a more complex grid to better control spacing
+    # We'll use nested gridspecs - one for the overall layout and one for each model
+    outer_grid = fig.add_gridspec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], 
+                                hspace=0.4, wspace=0.3)
     
     strategy_colors = {'five_shot': '#5ab4ac', 'cot': '#d8b365'}
     strategy_labels = {'five_shot': '5-shot', 'cot': 'CoT'}
@@ -121,80 +124,106 @@ def main(input_csv, output_file):
                       'lab-bench-protocolqa', 'vct']
     benchmark_order_mapping = {b: i for i, b in enumerate(benchmark_order)}
     
-    for ax, model in zip(axes, unique_models):
+    # Unique models
+    unique_models = pivoted['inspect_model_name'].unique()
+    
+    # Grid positions for each model
+    model_positions = [(0, 0), (0, 1), (1, 0), (1, 1)]
+    
+    for model_idx, (model, (row, col)) in enumerate(zip(unique_models, model_positions)):
         model_display = pivoted[pivoted['inspect_model_name'] == model]['epoch_model_name'].iloc[0]
         data = pivoted[pivoted['inspect_model_name'] == model].copy()
         
-        # Create benchmark ordering
+        # Apply benchmark ordering
         data['benchmark_order'] = data['benchmark'].map(benchmark_order_mapping)
         data = data.sort_values('benchmark_order')
         
-        # y positions for each benchmark
+        # Create a nested gridspec for this model (2 columns, 1 row)
+        inner_grid = outer_grid[row, col].subgridspec(1, 2, wspace=0.05)
+        
+        # Create axes for the two panels
+        ax1 = fig.add_subplot(inner_grid[0, 0])  # 5-shot panel
+        ax2 = fig.add_subplot(inner_grid[0, 1])  # CoT panel
+        
         y_positions = np.arange(len(data))
         
-        # Style the subplot
-        ax.axvline(1.0, color='#092327', linestyle='--', lw=1.5, alpha=0.7)
-        ax.grid(True, linestyle='--', alpha=0.7)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        
-        # Plot each strategy
-        for strategy, color, label, offset in [('five_shot', strategy_colors['five_shot'], 
-                                               strategy_labels['five_shot'], -0.15),
-                                              ('cot', strategy_colors['cot'], 
-                                               strategy_labels['cot'], 0.15)]:
-            for i, (idx, row) in enumerate(data.iterrows()):
-                ratio_col = f'ratio_{strategy}'
-                ci_low_col = f'ci_low_{strategy}'
-                ci_high_col = f'ci_high_{strategy}'
+        # Plot 5-shot data
+        for i, (idx, row_data) in enumerate(data.iterrows()):
+            if pd.notnull(row_data['ratio_five_shot']):
+                ratio = row_data['ratio_five_shot']
+                ci_low = row_data['ci_low_five_shot']
+                ci_high = row_data['ci_high_five_shot']
                 
-                if pd.notnull(row[ratio_col]):
-                    ratio = row[ratio_col]
-                    ci_low = row[ci_low_col]
-                    ci_high = row[ci_high_col]
-                    
-                    ax.errorbar(
-                        ratio, i + offset,
-                        xerr=[[ratio - ci_low], [ci_high - ratio]],
-                        fmt='o',
-                        color=color,
-                        ecolor='gray',
-                        capsize=3,
-                        markersize=6,
-                        alpha=0.8,
-                        label=label if i == 0 else ""
-                    )
+                ax1.errorbar(
+                    ratio, i,
+                    xerr=[[ratio - ci_low], [ci_high - ratio]],
+                    fmt='o',
+                    color=strategy_colors['five_shot'],
+                    ecolor='gray',
+                    capsize=3,
+                    markersize=6,
+                    alpha=0.8
+                )
         
-        # Improved y-axis labels
-        ax.set_yticks(y_positions)
-        ax.set_yticklabels([row['benchmark_display'] for _, row in data.iterrows()], 
-                          fontsize=11)
-        ax.set_ylim(-0.5, len(data) - 0.5)
+        # Plot CoT data
+        for i, (idx, row_data) in enumerate(data.iterrows()):
+            if pd.notnull(row_data['ratio_cot']):
+                ratio = row_data['ratio_cot']
+                ci_low = row_data['ci_low_cot']
+                ci_high = row_data['ci_high_cot']
+                
+                ax2.errorbar(
+                    ratio, i,
+                    xerr=[[ratio - ci_low], [ci_high - ratio]],
+                    fmt='o',
+                    color=strategy_colors['cot'],
+                    ecolor='gray',
+                    capsize=3,
+                    markersize=6,
+                    alpha=0.8
+                )
         
-        # Title and axis labels
-        ax.set_title(f"{model_display}", fontsize=13, fontweight='bold')
-        ax.set_xlabel("Fold difference vs. zero-shot", fontsize=12)
-        # Removed y-axis label as requested
+        # Style both subplots
+        for ax_idx, (ax, strategy) in enumerate(zip([ax1, ax2], ['5-shot', 'CoT'])):
+            # Reference line at 1.0
+            ax.axvline(1.0, color='#092327', linestyle='--', lw=1.5, alpha=0.7)
+            ax.grid(True, linestyle='--', alpha=0.7)
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            
+            # Y-axis labels (only for left subplot)
+            ax.set_yticks(y_positions)
+            if ax_idx == 0:  # Only add y-tick labels to left subplot of each pair
+                ax.set_yticklabels([row_data['benchmark_display'] for _, row_data in data.iterrows()], fontsize=11)
+            else:  # Hide y-tick labels on right subplot
+                ax.set_yticklabels([])
+            
+            ax.set_ylim(-0.5, len(data) - 0.5)
+            
+            # X-axis limits
+            ax.set_xlim(0.7, 1.8)
+            
+            # X-axis label - only for bottom row
+            if row == 1:  # Only add for bottom row
+                ax.set_xlabel("Fold difference vs. zero-shot", fontsize=12)
+            
+            # Subplot title (strategy name)
+            ax.set_title(strategy, fontsize=12, color=strategy_colors['five_shot' if strategy == '5-shot' else 'cot'])
         
-        # Consistent x-axis limits
-        ax.set_xlim(0.7, 1.8)
-    
-    # Single legend for the entire figure
-    handles, labels = [], []
-    for strategy, color, label in [('five_shot', strategy_colors['five_shot'], 
-                                   strategy_labels['five_shot']),
-                                  ('cot', strategy_colors['cot'], 
-                                   strategy_labels['cot'])]:
-        handles.append(plt.Line2D([0], [0], marker='o', color=color, 
-                                 linestyle='None', markersize=8))
-        labels.append(label)
-    
-    fig.legend(handles, labels, loc='lower center', ncol=2, 
-               bbox_to_anchor=(0.5, 0.01), fontsize=12)
+        # Position model title correctly above the pair of panels
+        # Calculate the center position between the two axes
+        left_pos = ax1.get_position().x0
+        right_pos = ax2.get_position().x1
+        center_pos = (left_pos + right_pos) / 2
+        top_pos = ax1.get_position().y1 + 0.02
+        
+        # Add model title
+        fig.text(center_pos, top_pos, model_display, 
+                ha='center', va='bottom', fontsize=13, fontweight='bold')
     
     plt.suptitle("Effect of Prompting Strategies Relative to Zero-Shot Performance", 
                 fontsize=16, fontweight='bold', y=0.98)
-    plt.tight_layout(rect=[0, 0.05, 1, 0.95])
+    
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
     plt.show()
 
