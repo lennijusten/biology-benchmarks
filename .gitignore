@@ -9,6 +9,6 @@ files_to_include.txt
 notes.md
 trendlines-blogpost/logs/
 vct_data/
-trendlines-preprints/backups/
-trendlines-preprints/logs/
-trendlines-preprints/logs_for_sharing/
+trendlines-preprint/backups/
+trendlines-preprint/logs/
+trendlines-preprint/logs_for_sharing/
