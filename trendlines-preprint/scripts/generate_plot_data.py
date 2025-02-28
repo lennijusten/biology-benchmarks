@@ -142,6 +142,9 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
         stats.append({
             'path': path,
             'inspect_model_name': name[0],
+            'epoch_model_name': group['epoch_model_name'].iloc[0],
+            'epoch_model_publication_date': group['epoch_model_publication_date'].iloc[0],
+            'epoch_organization': group['epoch_organization'].iloc[0],
             'benchmark': name[1], 
             'task_args': task_args,
             'prompt_schema': name[2],
@@ -159,7 +162,10 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
     # Order columns
     column_order = [
         'path',
-        'inspect_model_name', 
+        'inspect_model_name',
+        'epoch_model_name',
+        'epoch_model_publication_date',
+        'epoch_organization', 
         'benchmark',
         'task_args',
         'prompt_schema',
