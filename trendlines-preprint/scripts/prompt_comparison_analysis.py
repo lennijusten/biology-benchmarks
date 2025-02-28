@@ -33,15 +33,21 @@ def compute_fold_and_ci(mean_strat, std_strat, n_strat,
 def main(input_csv, output_file):
     df = pd.read_csv(input_csv)
 
-    # Models of interest
-    models_of_interest = [
-        'anthropic/claude-3-5-sonnet-20241022',
-        'google/gemini-1.5-pro',
-        'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo',
-        'openai/gpt-4o',
-        'openai/gpt-4o-2024-08-06'
-    ]
-    df = df[df['inspect_model_name'].isin(models_of_interest)]
+    # Create model mapping to handle model name variations
+    model_mapping = {
+        'anthropic/claude-3-5-sonnet-20241022': 'Claude 3.5 Sonnet',
+        'google/gemini-1.5-pro': 'Gemini 1.5 Pro',
+        'together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo': 'Llama 3.1-405B',
+        'openai/gpt-4o': 'GPT-4o',
+        'openai/gpt-4o-2024-08-06': 'GPT-4o'  # Map both versions to same name
+    }
+    
+    # Add a standardized model name column
+    df['model_std'] = df['inspect_model_name'].map(lambda x: model_mapping.get(x, x))
+    
+    # Filter by standardized model names
+    models_of_interest = ['Claude 3.5 Sonnet', 'Gemini 1.5 Pro', 'Llama 3.1-405B', 'GPT-4o']
+    df = df[df['model_std'].isin(models_of_interest)]
     
     # Benchmark display names
     benchmark_mapping = {
@@ -56,9 +62,9 @@ def main(input_csv, output_file):
     }
     df['benchmark_display'] = df['benchmark'].map(benchmark_mapping)
     
-    # Pivot table 
+    # Pivot table using standardized model name
     pivoted = df.pivot_table(
-        index=['benchmark', 'inspect_model_name', 'epoch_model_name', 'benchmark_display'],
+        index=['benchmark', 'model_std', 'epoch_model_name', 'benchmark_display'],
         columns='prompt_schema',
         values=['mean_accuracy', 'std_accuracy', 'num_runs']
     ).reset_index()
@@ -107,36 +113,69 @@ def main(input_csv, output_file):
     plt.rcParams['font.size'] = 12
     sns.set_style("whitegrid")
     
-    # Create figure with a custom layout that groups panels by model
+    # Create figure with custom layout
     fig = plt.figure(figsize=(16, 10))
     
-    # Create a more complex grid to better control spacing
-    # We'll use nested gridspecs - one for the overall layout and one for each model
+    # Create a nested gridspec layout
     outer_grid = fig.add_gridspec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], 
                                 hspace=0.4, wspace=0.3)
     
     strategy_colors = {'five_shot': '#5ab4ac', 'cot': '#d8b365'}
     strategy_labels = {'five_shot': '5-shot', 'cot': 'CoT'}
     
-    # Order benchmarks as requested
-    benchmark_order = ['pubmedqa', 'mmlu', 'gpqa', 'wmdp', 
-                      'lab-bench-litqa2', 'lab-bench-cloningscenarios', 
-                      'lab-bench-protocolqa', 'vct']
+    # REVERSED benchmark order as requested
+    benchmark_order = ['vct', 'lab-bench-protocolqa', 'lab-bench-cloningscenarios', 
+                     'lab-bench-litqa2', 'wmdp', 'gpqa', 'mmlu', 'pubmedqa']
     benchmark_order_mapping = {b: i for i, b in enumerate(benchmark_order)}
     
+    # Ensure all benchmarks are included
+    all_benchmarks = list(benchmark_order)
+    all_benchmarks_display = [benchmark_mapping[b] for b in all_benchmarks]
+    
     # Unique models
-    unique_models = pivoted['inspect_model_name'].unique()
+    unique_models = sorted(pivoted['model_std'].unique())
     
     # Grid positions for each model
     model_positions = [(0, 0), (0, 1), (1, 0), (1, 1)]
     
     for model_idx, (model, (row, col)) in enumerate(zip(unique_models, model_positions)):
-        model_display = pivoted[pivoted['inspect_model_name'] == model]['epoch_model_name'].iloc[0]
-        data = pivoted[pivoted['inspect_model_name'] == model].copy()
+        # Get the epoch_model_name (should be consistent across inspect_model variants)
+        model_display = pivoted[pivoted['model_std'] == model]['epoch_model_name'].iloc[0]
+        data = pivoted[pivoted['model_std'] == model].copy()
         
-        # Apply benchmark ordering
-        data['benchmark_order'] = data['benchmark'].map(benchmark_order_mapping)
-        data = data.sort_values('benchmark_order')
+        # Create a benchmark_present dictionary to check which benchmarks are present
+        benchmarks_present = set(data['benchmark'].unique())
+        
+        # Create a complete dataset including all benchmarks
+        complete_data = []
+        for bench in benchmark_order:
+            bench_data = data[data['benchmark'] == bench]
+            
+            if bench not in benchmarks_present:
+                # Create a placeholder row for missing benchmark
+                placeholder = {
+                    'benchmark': bench,
+                    'model_std': model,
+                    'benchmark_display': benchmark_mapping[bench],
+                    'benchmark_order': benchmark_order_mapping[bench],
+                    'ratio_five_shot': np.nan,
+                    'ratio_cot': np.nan,
+                    'ci_low_five_shot': np.nan,
+                    'ci_high_five_shot': np.nan,
+                    'ci_low_cot': np.nan,
+                    'ci_high_cot': np.nan
+                }
+                complete_data.append(placeholder)
+            else:
+                # Add existing benchmark data
+                for _, row_data in bench_data.iterrows():
+                    row_dict = row_data.to_dict()
+                    row_dict['benchmark_order'] = benchmark_order_mapping[bench]
+                    complete_data.append(row_dict)
+        
+        # Convert to DataFrame and sort
+        complete_df = pd.DataFrame(complete_data)
+        complete_df = complete_df.sort_values('benchmark_order')
         
         # Create a nested gridspec for this model (2 columns, 1 row)
         inner_grid = outer_grid[row, col].subgridspec(1, 2, wspace=0.05)
@@ -145,11 +184,11 @@ def main(input_csv, output_file):
         ax1 = fig.add_subplot(inner_grid[0, 0])  # 5-shot panel
         ax2 = fig.add_subplot(inner_grid[0, 1])  # CoT panel
         
-        y_positions = np.arange(len(data))
+        y_positions = np.arange(len(complete_df))
         
         # Plot 5-shot data
-        for i, (idx, row_data) in enumerate(data.iterrows()):
-            if pd.notnull(row_data['ratio_five_shot']):
+        for i, (idx, row_data) in enumerate(complete_df.iterrows()):
+            if pd.notnull(row_data.get('ratio_five_shot')):
                 ratio = row_data['ratio_five_shot']
                 ci_low = row_data['ci_low_five_shot']
                 ci_high = row_data['ci_high_five_shot']
@@ -166,8 +205,8 @@ def main(input_csv, output_file):
                 )
         
         # Plot CoT data
-        for i, (idx, row_data) in enumerate(data.iterrows()):
-            if pd.notnull(row_data['ratio_cot']):
+        for i, (idx, row_data) in enumerate(complete_df.iterrows()):
+            if pd.notnull(row_data.get('ratio_cot')):
                 ratio = row_data['ratio_cot']
                 ci_low = row_data['ci_low_cot']
                 ci_high = row_data['ci_high_cot']
@@ -194,11 +233,11 @@ def main(input_csv, output_file):
             # Y-axis labels (only for left subplot)
             ax.set_yticks(y_positions)
             if ax_idx == 0:  # Only add y-tick labels to left subplot of each pair
-                ax.set_yticklabels([row_data['benchmark_display'] for _, row_data in data.iterrows()], fontsize=11)
+                ax.set_yticklabels([row_data.get('benchmark_display', '') for _, row_data in complete_df.iterrows()], fontsize=11)
             else:  # Hide y-tick labels on right subplot
                 ax.set_yticklabels([])
             
-            ax.set_ylim(-0.5, len(data) - 0.5)
+            ax.set_ylim(-0.5, len(complete_df) - 0.5)
             
             # X-axis limits
             ax.set_xlim(0.7, 1.8)
