@@ -151,6 +151,8 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
             'total_samples': total_samples,
             'mean_accuracy': mean_accuracy,
             'std_accuracy': std_accuracy,
+            'mean_input_tokens': int(group['input_tokens'].mean()),
+            'mean_output_tokens': int(group['output_tokens'].mean()),
             'num_runs': len(group),
             'filenames': filenames
         })
@@ -171,7 +173,9 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
         'prompt_schema',
         'total_samples',
         'mean_accuracy',
-        'std_accuracy', 
+        'std_accuracy',
+        'mean_input_tokens',
+        'mean_output_tokens', 
         'num_runs',
         'filenames'
     ]
@@ -181,7 +185,7 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
 def main():
     parser = argparse.ArgumentParser(description='Process and combine model evaluation results')
     parser.add_argument('logs_dir', type=Path, help='Path to logs directory')
-    parser.add_argument('--output', type=Path, help='Output path for final CSV')
+    parser.add_argument('--output', type=Path, help='Output dir for final CSVs')
     parser.add_argument('--models-data', type=str, default='./trendlines-preprint/data/models/models_data.tsv',
                        help='Path to models data TSV file')
     parser.add_argument('--large-scale', type=str, 
@@ -193,7 +197,7 @@ def main():
     args = parser.parse_args()
     
     if not args.output:
-        args.output = args.logs_dir / 'combined_results.csv'
+        args.output = args.logs_dir
         
     # Load and process data
     runs_df = combine_result_csvs(args.logs_dir)
@@ -202,10 +206,10 @@ def main():
     stats_df = create_stats_df(runs_df)
     
     # Save results
-    runs_df.to_csv(args.output, index=False)
-    stats_df.to_csv(args.output.with_name('summary_stats.csv'), index=False)
-    print(f"Created final CSV at {args.output}")
-    print(f"Total rows: {len(runs_df)}")
+    runs_df.to_csv(args.output / f'{pd.Timestamp.now().strftime("%Y%m%d")}_all_runs.csv', index=False)
+    stats_df.to_csv(args.output / f'{pd.Timestamp.now().strftime("%Y%m%d")}_summary.csv', index=False)
+    print(f"Created CSV results at {args.output}")
+    print(f"Total runs: {len(runs_df)}")
 
 if __name__ == '__main__':
     main()
