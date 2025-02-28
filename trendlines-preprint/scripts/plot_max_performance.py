@@ -146,7 +146,7 @@ def main():
     
     # Define benchmarks to plot
     benchmarks = [
-        'pubmedqa', 'mmlu', 'wmdp', 'lab-bench-litqa2',
+        'pubmedqa', 'mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2',
         'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct'
     ]
     
