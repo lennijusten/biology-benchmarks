@@ -49,8 +49,7 @@ def get_benchmark_publication_date():
         'wmdp': '2024-03-05',
         'lab-bench-litqa2': '2024-07-14',
         'lab-bench-cloningscenarios': '2024-07-14',
-        'lab-bench-protocolqa': '2021-06-01',
-        'pubmedqa': '2024-07-14',
+        'lab-bench-protocolqa': '2024-07-14',
         'vct': '',
     }
     return publication_dates
