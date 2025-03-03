@@ -101,17 +101,40 @@ def create_benchmark_panel(df: pd.DataFrame, ax, benchmark_name: str, benchmark_
             label=properties['label']
         )
     
-    # Add benchmark publication date vertical line
+    # Handle benchmark publication date
     if not benchmark_df.empty and pd.notna(benchmark_df.iloc[0]['benchmark_publication_date']):
         pub_date = benchmark_df.iloc[0]['benchmark_publication_date']
-        ax.axvline(
-            x=pub_date,
-            color='#888888',
-            linestyle='-',
-            alpha=0.5,
-            linewidth=1.5,
-            label='Benchmark publication'
-        )
+        pub_date_str = pub_date.strftime('%b %Y')
+        
+        # Determine min and max model publication dates
+        min_model_date = benchmark_df['epoch_model_publication_date'].min()
+        max_model_date = benchmark_df['epoch_model_publication_date'].max()
+        
+        # Check if benchmark publication date is within the range of model dates
+        # Add some buffer (10% of the date range) to determine if it's "within range"
+        date_range = (max_model_date - min_model_date).total_seconds()
+        buffer = pd.Timedelta(seconds=date_range * 0.1)
+        
+        if min_model_date - buffer <= pub_date <= max_model_date + buffer:
+            # Publication date is within the model date range - show vertical line
+            ax.axvline(
+                x=pub_date,
+                color='#888888',
+                linestyle='-',
+                alpha=0.5,
+                linewidth=1.5,
+                label='Benchmark publication'
+            )
+        else:
+            # Publication date is outside the model date range - show text annotation
+            ax.text(
+                0.02, 0.98,  # Position in axes coordinates (top left)
+                f"Published: {pub_date_str}",
+                transform=ax.transAxes,
+                fontsize=9,
+                verticalalignment='top',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='#888888')
+            )
     
     # Set title and labels
     ax.set_title(benchmark_display_name)
