@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 from pathlib import Path
 from datasets import load_dataset
+from cost_functions import calculate_cost
 
 def load_metadata(notable_file: str, large_scale_file: str, models_data_file: str) -> pd.DataFrame:
     """Load and combine model metadata from multiple sources."""
@@ -15,7 +16,7 @@ def load_metadata(notable_file: str, large_scale_file: str, models_data_file: st
     epoch_df = epoch_df[['Model', 'Organization', 'Publication date']]
     
     models_df = pd.read_csv(models_data_file, sep='\t')
-    models_df = models_df[['inspect_model_name', 'epoch_model_name']]
+    models_df = models_df[['inspect_model_name', 'epoch_model_name', 'input_cost_per_M_tokens', 'output_cost_per_M_tokens', 'last_updated']]
     return models_df.merge(epoch_df, left_on='epoch_model_name', right_on='Model', how='left')
 
 def get_benchmark_baselines():
@@ -38,6 +39,21 @@ def get_benchmark_baselines():
         'vct': {'expert': None, 'non_expert': None, 'random': None},
     }
     return baselines
+
+def get_benchmark_publication_date():
+    """Get benchmark publication dates."""
+    publication_dates = {
+        'pubmedqa': '2019-09-13',
+        'mmlu': '2020-09-07',
+        'gpqa': '2023-11-20',
+        'wmdp': '2024-03-05',
+        'lab-bench-litqa2': '2024-07-14',
+        'lab-bench-cloningscenarios': '2024-07-14',
+        'lab-bench-protocolqa': '2021-06-01',
+        'pubmedqa': '2024-07-14',
+        'vct': '',
+    }
+    return publication_dates
 
 def combine_result_csvs(logs_dir: Path) -> pd.DataFrame:
     """Collect all results.csv files and combine them into a final dataframe."""
@@ -67,20 +83,35 @@ def combine_result_csvs(logs_dir: Path) -> pd.DataFrame:
         
     return pd.concat(dfs, ignore_index=True)
 
-def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame) -> pd.DataFrame:
+def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame, include_cost=False) -> pd.DataFrame:
     """Process and combine results with metadata."""
     df = pd.merge(df, model_metadata, on='inspect_model_name', how='left')
     baselines = get_benchmark_baselines()
+    benchmark_publication_dates = get_benchmark_publication_date()
 
     df['baselines'] = df['benchmark'].apply(lambda x: baselines.get(x, {}))
+    df['benchmark_publication_date'] = df['benchmark'].apply(lambda x: benchmark_publication_dates.get(x, None))
     
-    column_order = [
-        'inspect_model_name', 'epoch_model_name', 'epoch_model_publication_date',
-        'epoch_organization', 'benchmark', 'task_args', 'prompt_schema',
-        'total_samples', 'accuracy', 'stderr', 'baselines', 'total_tokens',
-        'input_tokens', 'output_tokens', 'run_id', 'eval_start_time',
-        'eval_end_time', 'results_generated_time', 'filename', 'cot_scoring'
-    ]
+    if include_cost:
+        df['est_cost'] = df.apply(lambda x: calculate_cost(x['input_tokens'], x['output_tokens'], x['inspect_model_name'], model_metadata), axis=1)
+        df['last_updated'] = pd.to_datetime(df['last_updated'])
+        df = df.rename(columns={'last_updated': 'cost_source_date'})
+        column_order = [
+            'inspect_model_name', 'epoch_model_name', 'epoch_model_publication_date',
+            'epoch_organization', 'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
+            'total_samples', 'accuracy', 'stderr', 'baselines', 'total_tokens',
+            'input_tokens', 'output_tokens', 'est_cost', 'cost_source_date', 'run_id', 'eval_start_time',
+            'eval_end_time', 'results_generated_time', 'filename', 'cot_scoring'
+        ]
+    else:
+        df.drop(columns=['input_cost_per_M_tokens', 'output_cost_per_M_tokens', 'last_updated'], inplace=True)
+        column_order = [
+            'inspect_model_name', 'epoch_model_name', 'epoch_model_publication_date',
+            'epoch_organization', 'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
+            'total_samples', 'accuracy', 'stderr', 'baselines', 'total_tokens',
+            'input_tokens', 'output_tokens', 'run_id', 'eval_start_time',
+            'eval_end_time', 'results_generated_time', 'filename', 'cot_scoring'
+        ]
     
     df = df.drop(columns=['task'])
     df = df.rename(columns={
@@ -89,7 +120,7 @@ def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame) -> 
     })
     return df[column_order]
 
-def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
+def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
     """
     Create summary statistics by grouping runs across model/eval/prompt combinations.
     
@@ -145,14 +176,18 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
             'epoch_model_name': group['epoch_model_name'].iloc[0],
             'epoch_model_publication_date': group['epoch_model_publication_date'].iloc[0],
             'epoch_organization': group['epoch_organization'].iloc[0],
-            'benchmark': name[1], 
+            'benchmark': name[1],
+            'benchmark_publication_date': group['benchmark_publication_date'].iloc[0], 
             'task_args': task_args,
             'prompt_schema': name[2],
             'total_samples': total_samples,
             'mean_accuracy': mean_accuracy,
             'std_accuracy': std_accuracy,
+            'baselines': group['baselines'].iloc[0],
             'mean_input_tokens': int(group['input_tokens'].mean()),
             'mean_output_tokens': int(group['output_tokens'].mean()),
+            'est_tot_cost': round(group['est_cost'].sum(), 2) if include_cost else None,
+            'cost_source_date': group['cost_source_date'].iloc[0] if include_cost else None,
             'num_runs': len(group),
             'filenames': filenames
         })
@@ -161,30 +196,56 @@ def create_stats_df(df: pd.DataFrame) -> pd.DataFrame:
     stats_df = pd.DataFrame(stats)
     stats_df = stats_df.sort_values(['inspect_model_name', 'benchmark', 'prompt_schema'])
     
-    # Order columns
-    column_order = [
-        'path',
-        'inspect_model_name',
-        'epoch_model_name',
-        'epoch_model_publication_date',
-        'epoch_organization', 
-        'benchmark',
-        'task_args',
-        'prompt_schema',
-        'total_samples',
-        'mean_accuracy',
-        'std_accuracy',
-        'mean_input_tokens',
-        'mean_output_tokens', 
-        'num_runs',
-        'filenames'
-    ]
+    if include_cost:
+        column_order = [
+            'path',
+            'inspect_model_name',
+            'epoch_model_name',
+            'epoch_model_publication_date',
+            'epoch_organization', 
+            'benchmark',
+            'benchmark_publication_date',
+            'task_args',
+            'prompt_schema',
+            'total_samples',
+            'mean_accuracy',
+            'std_accuracy',
+            'baselines',
+            'mean_input_tokens',
+            'mean_output_tokens',
+            'est_tot_cost',
+            'cost_source_date',
+            'num_runs',
+            'filenames'
+        ]
+    else:
+        stats_df.drop(columns=['est_tot_cost', 'cost_source_date'], inplace=True)
+        column_order = [
+            'path',
+            'inspect_model_name',
+            'epoch_model_name',
+            'epoch_model_publication_date',
+            'epoch_organization', 
+            'benchmark',
+            'benchmark_publication_date',
+            'task_args',
+            'prompt_schema',
+            'total_samples',
+            'mean_accuracy',
+            'std_accuracy',
+            'baselines',
+            'mean_input_tokens',
+            'mean_output_tokens', 
+            'num_runs',
+            'filenames'
+        ]
     
     return stats_df[column_order]
 
 def main():
     parser = argparse.ArgumentParser(description='Process and combine model evaluation results')
     parser.add_argument('logs_dir', type=Path, help='Path to logs directory')
+    parser.add_argument('--cost', action='store_true', help='Add cost data to results')
     parser.add_argument('--output', type=Path, help='Output dir for final CSVs')
     parser.add_argument('--models-data', type=str, default='./trendlines-preprint/data/models/models_data.tsv',
                        help='Path to models data TSV file')
@@ -202,8 +263,8 @@ def main():
     # Load and process data
     runs_df = combine_result_csvs(args.logs_dir)
     model_metadata = load_metadata(args.notable, args.large_scale, args.models_data)
-    runs_df = process_combined_results(runs_df, model_metadata)
-    stats_df = create_stats_df(runs_df)
+    runs_df = process_combined_results(runs_df, model_metadata, args.cost)
+    stats_df = create_stats_df(runs_df, args.cost)
     
     # Save results
     runs_df.to_csv(args.output / f'{pd.Timestamp.now().strftime("%Y%m%d")}_all_runs.csv', index=False)
