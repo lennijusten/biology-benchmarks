@@ -30,7 +30,7 @@ def compute_fold_and_ci(mean_strat, std_strat, n_strat,
     ci_high = np.exp(ci_log_high)
     return ratio, ci_low, ci_high
 
-def main(input_csv, output_file):
+def main(input_csv, output_file, csv_output=None):
     df = pd.read_csv(input_csv)
 
     # Create model mapping to handle model name variations
@@ -108,6 +108,58 @@ def main(input_csv, output_file):
             pivoted.loc[i, 'ci_low_cot'] = ci_low
             pivoted.loc[i, 'ci_high_cot'] = ci_high
     
+    # Create a consolidated DataFrame for CSV export
+    export_data = []
+    
+    benchmark_order = ['vct', 'lab-bench-protocolqa', 'lab-bench-cloningscenarios', 
+                     'lab-bench-litqa2', 'wmdp', 'gpqa', 'mmlu', 'pubmedqa']
+    
+    for model in models_of_interest:
+        model_data = pivoted[pivoted['model_std'] == model]
+        
+        for bench in benchmark_order:
+            bench_data = model_data[model_data['benchmark'] == bench]
+            
+            if bench_data.empty:
+                # Add placeholder row for missing benchmark
+                export_data.append({
+                    'model': model,
+                    'benchmark': bench,
+                    'five_shot_ratio': np.nan,
+                    'five_shot_ci_low': np.nan,
+                    'five_shot_ci_high': np.nan,
+                    'cot_ratio': np.nan,
+                    'cot_ci_low': np.nan,
+                    'cot_ci_high': np.nan,
+                    'zero_shot_accuracy': np.nan,
+                    'five_shot_accuracy': np.nan,
+                    'cot_accuracy': np.nan
+                })
+            else:
+                # Add data row for existing benchmark
+                for _, row in bench_data.iterrows():
+                    export_data.append({
+                        'model': model,
+                        'benchmark': bench,
+                        'five_shot_ratio': row.get('ratio_five_shot', np.nan),
+                        'five_shot_ci_low': row.get('ci_low_five_shot', np.nan),
+                        'five_shot_ci_high': row.get('ci_high_five_shot', np.nan),
+                        'cot_ratio': row.get('ratio_cot', np.nan),
+                        'cot_ci_low': row.get('ci_low_cot', np.nan),
+                        'cot_ci_high': row.get('ci_high_cot', np.nan),
+                        'zero_shot_accuracy': row.get('mean_accuracy_zero_shot', np.nan),
+                        'five_shot_accuracy': row.get('mean_accuracy_five_shot', np.nan),
+                        'cot_accuracy': row.get('mean_accuracy_zero_shot_cot', np.nan)
+                    })
+    
+    # Convert to DataFrame and save to CSV if output path is provided
+    export_df = pd.DataFrame(export_data)
+    if csv_output:
+        csv_path = Path(csv_output)
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        export_df.to_csv(csv_path, index=False)
+        print(f"Saved fold difference data to {csv_path}")
+    
     # Set style
     plt.rcParams['font.family'] = 'Arial'
     plt.rcParams['font.size'] = 12
@@ -123,9 +175,6 @@ def main(input_csv, output_file):
     strategy_colors = {'five_shot': '#5ab4ac', 'cot': '#d8b365'}
     strategy_labels = {'five_shot': '5-shot', 'cot': 'CoT'}
     
-    # REVERSED benchmark order as requested
-    benchmark_order = ['vct', 'lab-bench-protocolqa', 'lab-bench-cloningscenarios', 
-                     'lab-bench-litqa2', 'wmdp', 'gpqa', 'mmlu', 'pubmedqa']
     benchmark_order_mapping = {b: i for i, b in enumerate(benchmark_order)}
     
     # Ensure all benchmarks are included
@@ -264,17 +313,20 @@ def main(input_csv, output_file):
                 fontsize=16, fontweight='bold', y=0.98)
     
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    plt.show()
+    print(f"Saved plot to {output_file}")
+    
+    return export_df
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot fold differences for five-shot and CoT vs. zero-shot, one subplot per model.")
     parser.add_argument("input_csv", type=str, help="Path to the summary stats CSV file")
     parser.add_argument("--output", type=str, default="fold_plot.png", help="Output image file name")
+    parser.add_argument("--csv", type=str, default="fold_plot.csv", help="Output CSV file name for the fold difference data")
     args = parser.parse_args()
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    main(args.input_csv, out_path)
+    main(args.input_csv, args.output, args.csv)
 
 
