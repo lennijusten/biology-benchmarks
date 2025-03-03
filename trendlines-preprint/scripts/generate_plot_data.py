@@ -31,7 +31,7 @@ def get_benchmark_baselines():
     baselines = {
         'mmlu': {'expert': 0.898, 'non_expert': 0.345, 'random': 0.25},
         'gpqa': {'expert': 0.667, 'non_expert': 0.432, 'random': 0.25},
-        'wmdp': {'expert': 60.5, 'non_expert': None, 'random': 0.25},
+        'wmdp': {'expert': 0.605, 'non_expert': None, 'random': 0.25},
         'lab-bench-litqa2': {'expert': 0.70, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'LitQA2', 'train')},
         'lab-bench-cloningscenarios': {'expert': 0.60, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'CloningScenarios', 'train')},
         'lab-bench-protocolqa': {'expert': 0.79, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'ProtocolQA', 'train')},
