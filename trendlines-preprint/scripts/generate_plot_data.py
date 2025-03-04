@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import numpy as np
 import argparse
@@ -19,15 +20,38 @@ def load_metadata(notable_file: str, large_scale_file: str, models_data_file: st
     models_df = models_df[['inspect_model_name', 'epoch_model_name', 'input_cost_per_M_tokens', 'output_cost_per_M_tokens', 'last_updated']]
     return models_df.merge(epoch_df, left_on='epoch_model_name', right_on='Model', how='left')
 
+def compute_random_baseline(dataset, name, split):
+    dataset = load_dataset(dataset, name=name, split=split)
+    num_options = [len(record['distractors']) + 1 for record in dataset]
+    probabilities = [1/n for n in num_options]
+    random_guess_baseline = np.mean(probabilities)
+    return np.round(random_guess_baseline, decimals=3).item()
+
+def compute_vct_random_baseline(jsonl_path: str, subtasks: str) -> float:
+    """Compute random guess baseline for VCT dataset with multiple-response scoring."""
+    # Load VCT data
+    data = []
+    with open(jsonl_path, 'r') as f:
+        for line in f:
+            question = json.loads(line)
+            if subtasks == "no_images" and question["image_file"] is not None:
+                continue
+            data.append(question)
+    
+    # Calculate random guess probability for each question
+    random_guess_probs = []
+    for question in data:
+        num_statements = len(question["answer_statements"])
+        # Formula: 1/(2^n-1)
+        prob = 1 / (2**num_statements - 1)
+        random_guess_probs.append(prob)
+    
+    # Calculate average
+    avg_random_guess = np.mean(random_guess_probs)
+    return np.round(avg_random_guess, decimals=3).item()
+
 def get_benchmark_baselines():
     """Get benchmark baselines."""
-    def compute_random_baseline(dataset, name, split):
-        dataset = load_dataset(dataset, name=name, split=split)
-        num_options = [len(record['distractors']) + 1 for record in dataset]
-        probabilities = [1/n for n in num_options]
-        random_guess_baseline = np.mean(probabilities)
-        return np.round(random_guess_baseline, decimals=3).item()
-    
     baselines = {
         'mmlu': {'expert': 0.898, 'non_expert': 0.345, 'random': 0.25},
         'gpqa': {'expert': 0.667, 'non_expert': 0.432, 'random': 0.25},
@@ -36,7 +60,7 @@ def get_benchmark_baselines():
         'lab-bench-cloningscenarios': {'expert': 0.60, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'CloningScenarios', 'train')},
         'lab-bench-protocolqa': {'expert': 0.79, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'ProtocolQA', 'train')},
         'pubmedqa': {'expert': 0.78, 'non_expert': None, 'random': 0.333},
-        'vct': {'expert': None, 'non_expert': None, 'random': None},
+        'vct': {'expert': 0.221, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'no_images')},
     }
     return baselines
 
