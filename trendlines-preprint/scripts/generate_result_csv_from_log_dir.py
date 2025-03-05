@@ -48,7 +48,7 @@ def process_log_file(filepath: str, prompt_schema: str =None, is_cot: bool = Fal
     result = {
         'inspect_model_name': model,
         'task': log['eval']['task'],
-        'task_args': log['eval']['task_args'],
+        'task_args': {**log['eval']['task_args'], **log['plan']['config']},
         'prompt_schema': prompt_schema,
         'total_samples': log['eval']['dataset']['samples'],
         'accuracy': accuracy,
