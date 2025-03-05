@@ -23,7 +23,6 @@ def setup_environment(config: dict) -> None:
     for key, value in env_vars.items():
         os.environ[key] = str(value)
 
-
 def get_model_config(model_config: dict, global_config: dict) -> dict:
     """Merge global and model-specific configurations, with model-specific taking precedence"""
     merged_config = {**global_config, **model_config}
@@ -43,7 +42,6 @@ def run_benchmarks(config: dict) -> None:
         "pubmedqa": pubmedqa,
         "vct": vct
     }
-
     
     for benchmark_name, benchmark_config in config.get('benchmarks', {}).items():
         if not benchmark_config.get('enabled', True):
