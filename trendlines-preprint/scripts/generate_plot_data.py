@@ -60,7 +60,8 @@ def get_benchmark_baselines():
         'lab-bench-cloningscenarios': {'expert': 0.60, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'CloningScenarios', 'train')},
         'lab-bench-protocolqa': {'expert': 0.79, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'ProtocolQA', 'train')},
         'pubmedqa': {'expert': 0.78, 'non_expert': None, 'random': 0.333},
-        'vct': {'expert': 0.221, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'no_images')},
+        'vct': {'expert': 0.226, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'no_images')},
+        'vct_images': {'expert': 0.221, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'all')},
     }
     return baselines
 
