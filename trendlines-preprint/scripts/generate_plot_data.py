@@ -14,7 +14,7 @@ def load_metadata(notable_file: str, large_scale_file: str, models_data_file: st
     
     epoch_df = pd.concat([notable_df, large_scale_df], ignore_index=True)
     epoch_df = epoch_df.drop_duplicates(subset='Model', keep='first')
-    epoch_df = epoch_df[['Model', 'Organization', 'Publication date']]
+    epoch_df = epoch_df[['Model', 'Organization', 'Publication date', 'Parameters', 'Training compute (FLOP)']]
     
     models_df = pd.read_csv(models_data_file, sep='\t')
     models_df = models_df[['inspect_model_name', 'epoch_model_name', 'input_cost_per_M_tokens', 'output_cost_per_M_tokens', 'last_updated']]
@@ -53,13 +53,13 @@ def compute_vct_random_baseline(jsonl_path: str, subtasks: str) -> float:
 def get_benchmark_baselines():
     """Get benchmark baselines."""
     baselines = {
+        'pubmedqa': {'expert': 0.78, 'non_expert': None, 'random': 0.333},
         'mmlu': {'expert': 0.898, 'non_expert': 0.345, 'random': 0.25},
         'gpqa': {'expert': 0.667, 'non_expert': 0.432, 'random': 0.25},
         'wmdp': {'expert': 0.605, 'non_expert': None, 'random': 0.25},
         'lab-bench-litqa2': {'expert': 0.70, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'LitQA2', 'train')},
         'lab-bench-cloningscenarios': {'expert': 0.60, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'CloningScenarios', 'train')},
         'lab-bench-protocolqa': {'expert': 0.79, 'non_expert': None, 'random': compute_random_baseline('futurehouse/lab-bench', 'ProtocolQA', 'train')},
-        'pubmedqa': {'expert': 0.78, 'non_expert': None, 'random': 0.333},
         'vct': {'expert': 0.226, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'no_images')},
         'vct_images': {'expert': 0.221, 'non_expert': None, 'random': compute_vct_random_baseline('vct_data/vct_322Q-shared-set_2025-02-05.jsonl', 'all')},
     }
@@ -122,7 +122,8 @@ def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame, inc
         df = df.rename(columns={'last_updated': 'cost_source_date'})
         column_order = [
             'inspect_model_name', 'epoch_model_name', 'epoch_model_publication_date',
-            'epoch_organization', 'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
+            'epoch_organization', 'epoch_parameters', 'epoch_training_compute_flop', 
+            'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
             'total_samples', 'accuracy', 'stderr', 'baselines', 'total_tokens',
             'input_tokens', 'output_tokens', 'est_cost', 'cost_source_date', 'run_id', 'eval_start_time',
             'eval_end_time', 'results_generated_time', 'filename', 'cot_scoring'
@@ -131,7 +132,8 @@ def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame, inc
         df.drop(columns=['input_cost_per_M_tokens', 'output_cost_per_M_tokens', 'last_updated'], inplace=True)
         column_order = [
             'inspect_model_name', 'epoch_model_name', 'epoch_model_publication_date',
-            'epoch_organization', 'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
+            'epoch_organization', 'epoch_parameters', 'epoch_training_compute_flop', 
+            'benchmark', 'benchmark_publication_date', 'task_args', 'prompt_schema',
             'total_samples', 'accuracy', 'stderr', 'baselines', 'total_tokens',
             'input_tokens', 'output_tokens', 'run_id', 'eval_start_time',
             'eval_end_time', 'results_generated_time', 'filename', 'cot_scoring'
@@ -140,7 +142,9 @@ def process_combined_results(df: pd.DataFrame, model_metadata: pd.DataFrame, inc
     df = df.drop(columns=['task'])
     df = df.rename(columns={
         'Organization': 'epoch_organization',
-        'Publication date': 'epoch_model_publication_date'
+        'Publication date': 'epoch_model_publication_date',
+        'Parameters': 'epoch_parameters',
+        'Training compute (FLOP)': 'epoch_training_compute_flop',
     })
     return df[column_order]
 
@@ -159,6 +163,7 @@ def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
         'inspect_model_name',
         'benchmark',
         'prompt_schema',
+        'task_args'
     ])
 
     stats = []
@@ -180,15 +185,6 @@ def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
         total_samples = group['total_samples'].iloc[0]
         if not (group['total_samples'] == total_samples).all():
             print(f"Warning: Inconsistent total_samples in {path}")
-
-        # Get task args
-        if len(group['task_args'].unique()) == 1:
-            task_args = group['task_args'].iloc[0]
-        else:
-            # For runs with old task arg format, select the newer format
-            for i in group['task_args'].unique():
-                if len(group['task_args'].loc[group['task_args'] == i]) > 1:
-                    task_args = i 
             
         # Calculate statistics
         mean_accuracy = group['accuracy'].mean()
@@ -200,9 +196,11 @@ def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
             'epoch_model_name': group['epoch_model_name'].iloc[0],
             'epoch_model_publication_date': group['epoch_model_publication_date'].iloc[0],
             'epoch_organization': group['epoch_organization'].iloc[0],
+            'epoch_parameters': group['epoch_parameters'].iloc[0],
+            'epoch_training_compute_flop': group['epoch_training_compute_flop'].iloc[0],
             'benchmark': name[1],
             'benchmark_publication_date': group['benchmark_publication_date'].iloc[0], 
-            'task_args': task_args,
+            'task_args': group['task_args'].iloc[0],
             'prompt_schema': name[2],
             'total_samples': total_samples,
             'mean_accuracy': mean_accuracy,
@@ -226,7 +224,9 @@ def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
             'inspect_model_name',
             'epoch_model_name',
             'epoch_model_publication_date',
-            'epoch_organization', 
+            'epoch_organization',
+            'epoch_parameters',
+            'epoch_training_compute_flop', 
             'benchmark',
             'benchmark_publication_date',
             'task_args',
@@ -249,7 +249,9 @@ def create_stats_df(df: pd.DataFrame, include_cost=False) -> pd.DataFrame:
             'inspect_model_name',
             'epoch_model_name',
             'epoch_model_publication_date',
-            'epoch_organization', 
+            'epoch_organization',
+            'epoch_parameters',
+            'epoch_training_compute_flop',  
             'benchmark',
             'benchmark_publication_date',
             'task_args',
