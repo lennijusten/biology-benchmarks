@@ -48,7 +48,7 @@ def process_log_file(filepath: str, prompt_schema: str =None, is_cot: bool = Fal
     result = {
         'inspect_model_name': model,
         'task': log['eval']['task'],
-        'task_args': log['eval']['task_args'],
+        'task_args': {**log['eval']['task_args'], **log['plan']['config']},
         'prompt_schema': prompt_schema,
         'total_samples': log['eval']['dataset']['samples'],
         'accuracy': accuracy,
@@ -81,32 +81,23 @@ def process_directory(directory_path, prompt_schema=None, is_cot=False, output_d
             print(f"Error processing {file_path}: {e}")
     
     if results:
+        results_df = pd.DataFrame(results)
+
+        # For runs with old task and task arg format, select the newer format for consistency
+        if len(results_df['task_args'].apply(str).unique()) > 1:
+            task_args_counts = results_df['task_args'].apply(str).value_counts()
+            most_common_task_args = task_args_counts.idxmax()
+            results_df['task_args'] = most_common_task_args
+
+        if len(results_df['task'].unique()) > 1:
+            task_counts = results_df['task'].value_counts()
+            most_common_task = task_counts.idxmax()
+            results_df['task'] = most_common_task
+
         csv_path = output_dir / 'results.csv'
         
         # Write results to CSV
-        fieldnames = [
-            'inspect_model_name',
-            'task',
-            'task_args',
-            'prompt_schema',
-            'total_samples',
-            'accuracy',
-            'stderr',
-            'total_tokens',
-            'input_tokens',
-            'output_tokens',
-            'run_id',
-            'eval_start_time',
-            'eval_end_time',
-            'results_generated_time',
-            'filename',
-            'cot_scoring'
-        ]
-        
-        with open(csv_path, 'w', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(results)
+        results_df.to_csv(csv_path, index=False)
             
         print(f"Created CSV file: {csv_path}")
     else:

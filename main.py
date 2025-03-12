@@ -74,6 +74,7 @@ def run_benchmarks(config: dict) -> None:
                     eval_result = eval(
                         task,
                         model=model_name,
+                        log_format='json',
                         **eval_config
                     )
                     print(f"Completed run {run + 1}/{runs} for {model_key} on {benchmark_name}")

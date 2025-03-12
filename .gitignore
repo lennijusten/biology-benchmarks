@@ -1,5 +1,6 @@
 .DS_Store
 .venv/
+inspect_ai/
 .vscode/
 .env
 logs/
