@@ -178,6 +178,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
                 capthick=1.5,
                 elinewidth=1.5,
                 color=claude_color,
+                markeredgecolor=claude_color,  # Set marker edge color to match fill
                 label=f'Claude 3.7 Sonnet ({category})' if _ == 0 else "",
                 alpha=0.8
             )
@@ -230,6 +231,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
                 capthick=1.5,
                 elinewidth=1.5,
                 color=o3_color,
+                markeredgecolor=o3_color,  # Set marker edge color to match fill
                 label=f'o3-mini ({category})' if _ == 0 else "",
                 alpha=0.8
             )
@@ -312,37 +314,65 @@ def create_multi_benchmark_plot(all_data, output_file):
         if i % 2 == 0:
             axs[i].set_ylabel("Mean Accuracy (%)", fontsize=11)
     
-    # Create custom legend at the bottom
-    # First for models
-    model_handles = [
-        plt.Line2D([0], [0], color="#5ab4ac", lw=2, label='Claude 3.7 Sonnet'),
-        plt.Line2D([0], [0], color="#d8b365", lw=2, label='o3-mini')
-    ]
+    # Define model colors
+    claude_color = "#5ab4ac"  # Light blue-green
+    o3_color = "#d8b365"      # Light brown
     
-    # Then for reasoning efforts (using different markers)
-    reasoning_handles = [
-        plt.Line2D([0], [0], marker='o', color='gray', lw=0, label='No reasoning/Low effort', 
-                  markerfacecolor='gray', markersize=6),
-        plt.Line2D([0], [0], marker='^', color='gray', lw=0, label='4k tokens/Medium effort', 
-                  markerfacecolor='gray', markersize=6),
-        plt.Line2D([0], [0], marker='s', color='gray', lw=0, label='16k tokens/High effort', 
-                  markerfacecolor='gray', markersize=6)
-    ]
+    # Define markers
+    markers = ['o', '^', 's']
     
-    # Add both legend groups to the figure
-    fig.legend(handles=model_handles, loc='upper center', ncol=2, fontsize=10, 
-               bbox_to_anchor=(0.5, 0.98), frameon=True)
-               
-    fig.legend(handles=reasoning_handles, loc='lower center', ncol=3, fontsize=9, 
-               bbox_to_anchor=(0.5, 0.02), frameon=True)
+    # Define label names
+    claude_labels = ["No reasoning limit specified", "4k reasoning token limit", "16k reasoning token limit"]
+    o3_labels = ["Low reasoning effort", "Medium reasoning effort", "High reasoning effort"]
+    
+    # Create a single legend at the bottom
+    # Create a figure-level legend with custom layout
+    legend_elements = []
+    
+    # Add Claude elements
+    legend_elements.append(plt.Line2D([0], [0], marker=None, color='none', label=f'Claude 3.7 Sonnet', 
+                          markerfacecolor='none', markersize=0))
+    for i, label in enumerate(claude_labels):
+        legend_elements.append(plt.Line2D([0], [0], marker=markers[i], color='none', label=f'    {label}', 
+                              markerfacecolor=claude_color, markeredgecolor=claude_color, markersize=6))
+    
+    # Add o3-mini elements
+    legend_elements.append(plt.Line2D([0], [0], marker=None, color='none', label=f'o3-mini', 
+                          markerfacecolor='none', markersize=0))
+    for i, label in enumerate(o3_labels):
+        legend_elements.append(plt.Line2D([0], [0], marker=markers[i], color='none', label=f'    {label}', 
+                              markerfacecolor=o3_color, markeredgecolor=o3_color, markersize=6))
+    
+    # Position the legend
+    legend = fig.legend(
+        handles=legend_elements,
+        loc='lower center',
+        ncol=2,
+        fontsize=9,
+        frameon=True,
+        columnspacing=1.0,
+        handletextpad=0.5,
+        bbox_to_anchor=(0.5, 0.01)
+    )
+    
+    # Set the frame properties to create a black box around the legend
+    legend.get_frame().set_edgecolor('black')
+    legend.get_frame().set_linewidth(1.0)
+    
+    # Set different colors for the model name labels
+    legend_texts = legend.get_texts()
+    legend_texts[0].set_color(claude_color)  # Claude 3.7 Sonnet
+    legend_texts[0].set_fontweight('bold')
+    legend_texts[4].set_color(o3_color)      # o3-mini
+    legend_texts[4].set_fontweight('bold')
     
     # Add a main title
     fig.suptitle("Effect of Reasoning Effort on Model Performance Across Benchmarks", 
                  fontsize=14, fontweight='bold', y=0.995)
     
-    # Adjust layout with more space between subplots
-    plt.tight_layout(rect=[0, 0.08, 1, 0.95])
-    plt.subplots_adjust(top=0.92, wspace=0.3, hspace=0.3)  # Increased spacing
+    # Adjust layout with less space between subplots and legend
+    plt.tight_layout(rect=[0, 0.1, 1, 0.95])
+    plt.subplots_adjust(top=0.92, wspace=0.3, hspace=0.3, bottom=0.15)
     
     # Save figure
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
