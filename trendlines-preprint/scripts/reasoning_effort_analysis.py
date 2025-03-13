@@ -74,7 +74,7 @@ def get_reasoning_data(df, benchmark_name):
     # Add a category for "no reasoning" (default)
     claude_no_reasoning = claude_data[claude_data['reasoning_tokens'].isna()].copy()
     if not claude_no_reasoning.empty:
-        claude_no_reasoning['reasoning_category'] = "No reasoning"
+        claude_no_reasoning['reasoning_category'] = "No reasoning limit specified"
     
     # Get rows with reasoning tokens
     claude_with_reasoning = claude_data[claude_data['reasoning_tokens'].notna()].copy()
@@ -126,7 +126,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     
     # Define markers for different reasoning settings
     claude_markers = {
-        "No reasoning": "o",
+        "No reasoning limit specified": "o",
         "4k reasoning token limit": "^", 
         "16k reasoning token limit": "s"
     }
@@ -147,16 +147,19 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
             'total_samples': 'first'  # Get the sample count
         }).reset_index()
         
+        # Calculate mean tokens per question by dividing by the number of samples
+        claude_grouped['tokens_per_question'] = claude_grouped['mean_output_tokens'] / claude_grouped['total_samples']
+        
         # Store sample count if provided
         if sample_counts is not None and not claude_grouped.empty:
             sample_counts[benchmark_name] = int(claude_grouped['total_samples'].iloc[0])
         
         # Sort by token count (no reasoning should be first)
-        claude_grouped = claude_grouped.sort_values('mean_output_tokens')
+        claude_grouped = claude_grouped.sort_values('tokens_per_question')
         
         # First plot the connecting line
         ax.plot(
-            claude_grouped['mean_output_tokens'],
+            claude_grouped['tokens_per_question'],
             claude_grouped['mean_accuracy'] * 100,
             color=claude_color,
             linewidth=2,
@@ -169,7 +172,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
             marker = claude_markers.get(category, "o")
             
             ax.errorbar(
-                row['mean_output_tokens'], 
+                row['tokens_per_question'], 
                 row['mean_accuracy'] * 100,  # Convert to percentage
                 yerr=row['std_accuracy'] * 100,  # Convert to percentage
                 fmt=marker, 
@@ -193,6 +196,9 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
             'total_samples': 'first'  # Get the sample count
         }).reset_index()
         
+        # Calculate mean tokens per question by dividing by the number of samples
+        o3_grouped['tokens_per_question'] = o3_grouped['mean_output_tokens'] / o3_grouped['total_samples']
+        
         # Store sample count if provided
         if sample_counts is not None and not o3_grouped.empty:
             sample_counts[benchmark_name] = int(o3_grouped['total_samples'].iloc[0])
@@ -209,7 +215,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
         
         # First plot the connecting line
         ax.plot(
-            o3_grouped['mean_output_tokens'],
+            o3_grouped['tokens_per_question'],
             o3_grouped['mean_accuracy'] * 100,
             color=o3_color,
             linewidth=2,
@@ -222,7 +228,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
             marker = o3_markers.get(category, "o")
             
             ax.errorbar(
-                row['mean_output_tokens'], 
+                row['tokens_per_question'], 
                 row['mean_accuracy'] * 100,  # Convert to percentage
                 yerr=row['std_accuracy'] * 100,  # Convert to percentage
                 fmt=marker, 
@@ -243,7 +249,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     ax.set_xscale('log')
     
     # Set x-axis limits - start at 100 as requested
-    ax.set_xlim(100, 1000000)
+    ax.set_xlim(1, 100000)
     
     # Format x-axis tick labels
     def format_ticks(x, pos):
@@ -255,7 +261,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     ax.xaxis.set_major_formatter(plt.FuncFormatter(format_ticks))
     
     # Set explicit x-axis ticks
-    ax.set_xticks([100, 1000, 10000, 100000, 1000000])
+    ax.set_xticks([1, 10, 100, 1000, 10000, 100000])
     
     # Set y-axis limits with some padding to ensure error bars aren't cut off
     if not (claude_data.empty and o3_data.empty):
