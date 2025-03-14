@@ -13,3 +13,5 @@ vct_data/
 trendlines-preprint/backups/
 trendlines-preprint/logs/
 trendlines-preprint/logs_for_sharing/
+*.png
+*.csv
