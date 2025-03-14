@@ -67,6 +67,10 @@ def create_benchmark_panel(df: pd.DataFrame, ax, benchmark_name: str, benchmark_
     for org in sorted(benchmark_df['epoch_organization'].unique()):
         org_data = benchmark_df[benchmark_df['epoch_organization'] == org].sort_values('epoch_model_publication_date')
         
+        # For rows with the same model name, take the one with the max mean accuracy 
+        # (applies to same model w different reasoning settings)
+        org_data = org_data.loc[org_data.groupby('inspect_model_name')['mean_accuracy'].idxmax()]
+        
         # Plot scatter points
         ax.scatter(
             org_data['epoch_model_publication_date'], 
@@ -76,7 +80,7 @@ def create_benchmark_panel(df: pd.DataFrame, ax, benchmark_name: str, benchmark_
             s=60, 
             alpha=0.8
         )
-        
+
         # Add error bars
         ax.errorbar(
             org_data['epoch_model_publication_date'], 
