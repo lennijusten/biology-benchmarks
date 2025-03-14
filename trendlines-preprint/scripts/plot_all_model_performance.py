@@ -135,13 +135,13 @@ def create_benchmark_panel(df: pd.DataFrame, ax, benchmark_name: str, benchmark_
                 0.02, 0.98,  # Position in axes coordinates (top left)
                 f"Published: {pub_date_str}",
                 transform=ax.transAxes,
-                fontsize=9,
+                fontsize=13,
                 verticalalignment='top',
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7, edgecolor='#888888')
             )
     
     # Set title and labels
-    ax.set_title(benchmark_display_name)
+    ax.set_title(benchmark_display_name, fontsize=16)
     
     # Format x-axis
     ax.xaxis.set_major_locator(mdates.YearLocator())
@@ -150,7 +150,7 @@ def create_benchmark_panel(df: pd.DataFrame, ax, benchmark_name: str, benchmark_
     # Format y-axis
     ax.set_ylim(0, 1.0)
     ax.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
-    ax.set_yticklabels(['0%', '20%', '40%', '60%', '80%', '100%'])
+    ax.set_yticklabels(['0%', '20%', '40%', '60%', '80%', '100%'], fontsize=14)
     
     # Add grid and customize appearance
     ax.grid(True, linestyle='--', alpha=0.7)
@@ -173,7 +173,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     
     # Set up the plot style
     plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 11
+    plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
     
     # Create color map for organizations - ordered alphabetically
@@ -183,7 +183,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     
     # Create figure with grid
     fig = plt.figure(figsize=(16, 12), dpi=300)
-    gs = GridSpec(2, 4, figure=fig, hspace=0.4, wspace=0.3)
+    gs = GridSpec(2, 4, figure=fig, hspace=0.25, wspace=0.3)
     
     # Create panels for each benchmark
     for i, (benchmark_name, benchmark_display) in enumerate(benchmarks.items()):
@@ -207,7 +207,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     # Add all legend elements
     # Organizations
     for org in sorted(organizations):
-        legend_ax.plot([], [], marker='o', linestyle='', color=color_map[org], label=org, markersize=8)
+        legend_ax.plot([], [], marker='o', linestyle='', color=color_map[org], label=org, markersize=10)
         
     # Baseline lines - explicitly add all types
     legend_ax.plot([], [], color='#092327', linestyle='--', label='Expert accuracy', linewidth=1.5)
@@ -229,7 +229,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
         bbox_to_anchor=(0.5, 0.05),
         ncol=min(5, len(handles)),
         frameon=True,
-        fontsize=10
+        fontsize=14
     )
     
     # Add overall title
