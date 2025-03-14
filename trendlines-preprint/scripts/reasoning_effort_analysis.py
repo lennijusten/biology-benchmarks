@@ -286,7 +286,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     
     return ax
 
-def create_multi_benchmark_plot(all_data, output_file):
+def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
     """Create a single 2x2 plot showing all benchmarks."""
     # Set up the plot style
     plt.rcParams['font.family'] = 'Arial'
@@ -298,10 +298,13 @@ def create_multi_benchmark_plot(all_data, output_file):
     axs = axs.flatten()
     
     # Define benchmark order and names
-    benchmarks = ['vct', 'gpqa', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa']
+    benchmarks = ['gpqa', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct']
     
     # Keep track of sample counts
     sample_counts = {}
+    
+    # Create a list to store all the data for CSV export
+    all_plotted_data = []
     
     # Plot each benchmark in its subplot
     for i, benchmark_name in enumerate(benchmarks):
@@ -319,6 +322,71 @@ def create_multi_benchmark_plot(all_data, output_file):
         # Only add y-axis label to left subplots
         if i % 2 == 0:
             axs[i].set_ylabel("Mean Accuracy (%)", fontsize=11)
+        
+        # Process data for CSV export if requested
+        if csv_output:
+            # Process Claude data
+            if not claude_data.empty:
+                claude_grouped = claude_data.groupby('reasoning_category').agg({
+                    'mean_output_tokens': 'mean',
+                    'mean_accuracy': 'mean',
+                    'std_accuracy': 'mean',
+                    'total_samples': 'first'
+                }).reset_index()
+                
+                claude_grouped['tokens_per_question'] = claude_grouped['mean_output_tokens'] / claude_grouped['total_samples']
+                
+                for _, row in claude_grouped.iterrows():
+                    all_plotted_data.append({
+                        'benchmark': benchmark_name,
+                        'model': 'Claude 3.7 Sonnet',
+                        'reasoning_category': row['reasoning_category'],
+                        'mean_accuracy': row['mean_accuracy'] * 100,  # Convert to percentage
+                        'std_accuracy': row['std_accuracy'] * 100,    # Convert to percentage
+                        'tokens_per_question': row['tokens_per_question'],
+                        'mean_output_tokens': row['mean_output_tokens'],
+                        'total_samples': row['total_samples']
+                    })
+            
+            # Process o3-mini data
+            if not o3_data.empty:
+                o3_grouped = o3_data.groupby('reasoning_category').agg({
+                    'mean_output_tokens': 'mean',
+                    'mean_accuracy': 'mean',
+                    'std_accuracy': 'mean',
+                    'total_samples': 'first'
+                }).reset_index()
+                
+                o3_grouped['tokens_per_question'] = o3_grouped['mean_output_tokens'] / o3_grouped['total_samples']
+                
+                for _, row in o3_grouped.iterrows():
+                    all_plotted_data.append({
+                        'benchmark': benchmark_name,
+                        'model': 'o3-mini',
+                        'reasoning_category': row['reasoning_category'],
+                        'mean_accuracy': row['mean_accuracy'] * 100,  # Convert to percentage
+                        'std_accuracy': row['std_accuracy'] * 100,    # Convert to percentage
+                        'tokens_per_question': row['tokens_per_question'],
+                        'mean_output_tokens': row['mean_output_tokens'],
+                        'total_samples': row['total_samples']
+                    })
+    
+    # Save data to CSV if requested
+    if csv_output and all_plotted_data:
+        df_export = pd.DataFrame(all_plotted_data)
+        
+        # Map benchmark names to their display names
+        benchmark_display = {
+            "vct": "VCT",
+            "gpqa": "GPQA",
+            "lab-bench-cloningscenarios": "CloningScenarios",
+            "lab-bench-protocolqa": "ProtocolQA"
+        }
+        df_export['benchmark_display'] = df_export['benchmark'].map(lambda x: benchmark_display.get(x, x))
+        
+        # Save to CSV
+        df_export.to_csv(csv_output, index=False)
+        print(f"Data exported to CSV: {csv_output}")
     
     # Define model colors
     claude_color = "#5ab4ac"  # Light blue-green
@@ -389,6 +457,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate reasoning effort vs accuracy plots.')
     parser.add_argument('input', type=str, help='Input CSV file path')
     parser.add_argument('--output', type=str, default='reasoning_plot.png', help='Output image file path')
+    parser.add_argument('--csv', type=str, help='Optional CSV output file for the plotted data')
     
     args = parser.parse_args()
     
@@ -396,11 +465,18 @@ def main():
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
+    # Handle CSV output path if provided
+    csv_output = None
+    if args.csv:
+        csv_path = Path(args.csv)
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        csv_output = csv_path
+    
     # Load and prepare data
     df = load_and_prepare_data(args.input)
     
     # Fixed set of benchmarks
-    benchmarks = ['vct', 'gpqa', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa']
+    benchmarks = ['gpqa', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct']
     
     # Store data for all benchmarks
     all_benchmark_data = {}
@@ -415,8 +491,8 @@ def main():
             
         all_benchmark_data[benchmark] = (claude_data, o3_data)
     
-    # Create the combined plot
-    create_multi_benchmark_plot(all_benchmark_data, args.output)
+    # Create the combined plot and optionally save CSV
+    create_multi_benchmark_plot(all_data=all_benchmark_data, output_file=args.output, csv_output=csv_output)
 
 if __name__ == "__main__":
     main()
