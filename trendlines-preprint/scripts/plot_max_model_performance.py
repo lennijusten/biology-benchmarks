@@ -42,7 +42,7 @@ def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Di
     
     # Set up the plot style
     plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 12
+    plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
     
     # Create figure
@@ -76,7 +76,7 @@ def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Di
                          label=benchmark_names[bench],
                          where='post',
                          linewidth=2,
-                         alpha=0.7)
+                         alpha=0.4)
             
             # Add dots in same color as line, excluding the artificially added last point
             line_color = line[0].get_color()
@@ -101,7 +101,7 @@ def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Di
     
     # Customize plot
     ax.set_xlabel("Model Publication Date", fontsize=14)
-    ax.set_ylabel("Mean Accuracy (Zero-shot)", fontsize=14)
+    ax.set_ylabel("Accuracy", fontsize=14)
     ax.set_title("Top Model Performance Over Time by Benchmark", fontsize=16, pad=20)
     
     # Format x-axis
@@ -118,9 +118,9 @@ def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Di
     legend = ax.legend(title="Benchmarks", 
                       loc='center left', 
                       bbox_to_anchor=(1, 0.5),
-                      fontsize=10)
+                      fontsize=14)
     legend.get_frame().set_alpha(1)
-    plt.setp(legend.get_title(), fontsize=12, fontweight='bold')
+    plt.setp(legend.get_title(), fontsize=14, fontweight='bold')
     
     # Remove organization legend since we're not using organization colors anymore
     
