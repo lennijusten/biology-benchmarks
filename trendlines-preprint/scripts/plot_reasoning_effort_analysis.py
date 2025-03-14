@@ -243,7 +243,7 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
             )
     
     # Set title and axis labels
-    ax.set_title(display_name, fontsize=12, fontweight='bold')
+    ax.set_title(display_name, fontsize=16)
     
     # Always use log scale for x-axis
     ax.set_xscale('log')
@@ -287,15 +287,22 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     return ax
 
 def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
-    """Create a single 2x2 plot showing all benchmarks."""
+    """Create a single row plot showing all benchmarks."""
     # Set up the plot style
     plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 11
+    plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
     
-    # Create the figure with 2x2 subplots
-    fig, axs = plt.subplots(2, 2, figsize=(12, 10), dpi=300)
-    axs = axs.flatten()
+    # Create figure - make it wider to accommodate single row
+    fig = plt.figure(figsize=(20, 5), dpi=300)
+    
+    # Create GridSpec with configurable spacing
+    gs = fig.add_gridspec(1, 4, wspace=0.3)
+    
+    # Create axes using GridSpec
+    axs = []
+    for i in range(4):
+        axs.append(fig.add_subplot(gs[0, i]))
     
     # Define benchmark order and names
     benchmarks = ['gpqa', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct']
@@ -306,7 +313,7 @@ def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
     # Create a list to store all the data for CSV export
     all_plotted_data = []
     
-    # Plot each benchmark in its subplot
+        # Plot each benchmark in its subplot
     for i, benchmark_name in enumerate(benchmarks):
         if benchmark_name not in all_data:
             print(f"No data found for benchmark: {benchmark_name}")
@@ -315,13 +322,12 @@ def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
         claude_data, o3_data = all_data[benchmark_name]
         plot_single_benchmark(axs[i], claude_data, o3_data, benchmark_name, sample_counts)
         
-        # Only add x-axis label to bottom subplots
-        if i >= 2:
-            axs[i].set_xlabel("Mean Output Tokens per Question", fontsize=11)
+        # Add x-axis label to all subplots
+        axs[i].set_xlabel("Mean Output Tokens per Question", fontsize=14)
         
-        # Only add y-axis label to left subplots
-        if i % 2 == 0:
-            axs[i].set_ylabel("Mean Accuracy (%)", fontsize=11)
+        # Only add y-axis label to leftmost subplot
+        if i == 0:
+            axs[i].set_ylabel("Accuracy", fontsize=14)
         
         # Process data for CSV export if requested
         if csv_output:
@@ -388,65 +394,55 @@ def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
         df_export.to_csv(csv_output, index=False)
         print(f"Data exported to CSV: {csv_output}")
     
-    # Define model colors
-    claude_color = "#5ab4ac"  # Light blue-green
-    o3_color = "#d8b365"      # Light brown
-    
-    # Define markers
+    # Define colors and other styling elements
+    claude_color = "#5ab4ac"
+    o3_color = "#d8b365"
     markers = ['o', '^', 's']
-    
-    # Define label names
     claude_labels = ["No reasoning limit specified", "4k reasoning token limit", "16k reasoning token limit"]
     o3_labels = ["Low reasoning effort", "Medium reasoning effort", "High reasoning effort"]
     
-    # Create a single legend at the bottom
-    # Create a figure-level legend with custom layout
+    # Create legend elements
     legend_elements = []
     
     # Add Claude elements
     legend_elements.append(plt.Line2D([0], [0], marker=None, color='none', label=f'Claude 3.7 Sonnet', 
-                          markerfacecolor='none', markersize=0))
+                          markerfacecolor='none', markersize=8))
     for i, label in enumerate(claude_labels):
         legend_elements.append(plt.Line2D([0], [0], marker=markers[i], color='none', label=f'    {label}', 
-                              markerfacecolor=claude_color, markeredgecolor=claude_color, markersize=6))
+                              markerfacecolor=claude_color, markeredgecolor=claude_color, markersize=8))
     
     # Add o3-mini elements
     legend_elements.append(plt.Line2D([0], [0], marker=None, color='none', label=f'o3-mini', 
-                          markerfacecolor='none', markersize=0))
+                          markerfacecolor='none', markersize=8))
     for i, label in enumerate(o3_labels):
         legend_elements.append(plt.Line2D([0], [0], marker=markers[i], color='none', label=f'    {label}', 
-                              markerfacecolor=o3_color, markeredgecolor=o3_color, markersize=6))
+                              markerfacecolor=o3_color, markeredgecolor=o3_color, markersize=8))
     
-    # Position the legend
+    # Position the legend - adjust for single row layout
     legend = fig.legend(
         handles=legend_elements,
         loc='lower center',
         ncol=2,
-        fontsize=9,
+        fontsize=14,
         frameon=True,
         columnspacing=1.0,
         handletextpad=0.5,
-        bbox_to_anchor=(0.5, 0.01)
+        bbox_to_anchor=(0.5, -0.3)  # Adjusted to account for single row
     )
     
-    # Set the frame properties to create a black box around the legend
-    legend.get_frame().set_edgecolor('black')
-    legend.get_frame().set_linewidth(1.0)
-    
-    # Set different colors for the model name labels
+    # Set different colors for model name labels
     legend_texts = legend.get_texts()
-    legend_texts[0].set_color(claude_color)  # Claude 3.7 Sonnet
+    legend_texts[0].set_color(claude_color)
     legend_texts[0].set_fontweight('bold')
-    legend_texts[4].set_color(o3_color)      # o3-mini
+    legend_texts[4].set_color(o3_color)
     legend_texts[4].set_fontweight('bold')
     
-    # Add a main title
+    # Add main title - adjust y position for single row layout
     fig.suptitle("Effect of Reasoning Effort on Model Performance Across Benchmarks", 
-                 fontsize=14, fontweight='bold', y=0.995)
+                 fontsize=14, fontweight='bold', y=1.05)
     
-    # Adjust layout with less space between subplots and legend
-    plt.tight_layout(rect=[0, 0.1, 1, 0.95])
-    plt.subplots_adjust(top=0.92, wspace=0.3, hspace=0.3, bottom=0.15)
+    # Adjust layout for legend
+    plt.tight_layout(rect=[0, 0.15, 1, 0.95])
     
     # Save figure
     plt.savefig(output_file, dpi=300, bbox_inches='tight')
