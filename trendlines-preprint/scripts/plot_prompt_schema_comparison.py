@@ -162,7 +162,7 @@ def main(input_csv, output_file, csv_output=None):
     
     # Set style
     plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 12
+    plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
     
     # Create figure with custom layout
@@ -170,7 +170,7 @@ def main(input_csv, output_file, csv_output=None):
     
     # Create a nested gridspec layout
     outer_grid = fig.add_gridspec(2, 2, height_ratios=[1, 1], width_ratios=[1, 1], 
-                                hspace=0.4, wspace=0.3)
+                                hspace=0.25, wspace=0.3)
     
     strategy_colors = {'five_shot': '#5ab4ac', 'cot': '#d8b365'}
     strategy_labels = {'five_shot': '5-shot', 'cot': 'CoT'}
@@ -248,8 +248,8 @@ def main(input_csv, output_file, csv_output=None):
                     fmt='o',
                     color=strategy_colors['five_shot'],
                     ecolor='gray',
-                    capsize=3,
-                    markersize=6,
+                    capsize=4,
+                    markersize=7,
                     alpha=0.8
                 )
         
@@ -266,8 +266,8 @@ def main(input_csv, output_file, csv_output=None):
                     fmt='o',
                     color=strategy_colors['cot'],
                     ecolor='gray',
-                    capsize=3,
-                    markersize=6,
+                    capsize=4,
+                    markersize=7,
                     alpha=0.8
                 )
         
@@ -293,10 +293,10 @@ def main(input_csv, output_file, csv_output=None):
             
             # X-axis label - only for bottom row
             if row == 1:  # Only add for bottom row
-                ax.set_xlabel("Fold difference vs. zero-shot", fontsize=12)
+                ax.set_xlabel("Fold difference vs. zero-shot", fontsize=14)
             
             # Subplot title (strategy name)
-            ax.set_title(strategy, fontsize=12, color=strategy_colors['five_shot' if strategy == '5-shot' else 'cot'])
+            ax.set_title(strategy, fontsize=14, color=strategy_colors['five_shot' if strategy == '5-shot' else 'cot'])
         
         # Position model title correctly above the pair of panels
         # Calculate the center position between the two axes
@@ -307,7 +307,7 @@ def main(input_csv, output_file, csv_output=None):
         
         # Add model title
         fig.text(center_pos, top_pos, model_display, 
-                ha='center', va='bottom', fontsize=13, fontweight='bold')
+                ha='center', va='bottom', fontsize=16)
     
     plt.suptitle("Effect of Prompting Strategies Relative to Zero-Shot Performance", 
                 fontsize=16, fontweight='bold', y=0.98)
