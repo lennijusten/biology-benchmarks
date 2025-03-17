@@ -1,0 +1,31 @@
+inspect_model_name	epoch_model_name	cost_per_M_tokens	input_cost_per_M_tokens	output_cost_per_M_tokens	cost_source	api_source	last_updated
+anthropic/claude-2.0	Claude 2		$8.00	$24.00	https://www.anthropic.com/pricing#anthropic-api	https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py	2024-12-04
+anthropic/claude-3-5-sonnet-20240620	Claude 3.5 Sonnet		$3.00	$15.00	https://www.anthropic.com/pricing#anthropic-api	https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py	2025-02-28
+anthropic/claude-3-5-sonnet-20241022	Claude 3.5 Sonnet		$3.00	$15.00	https://www.anthropic.com/pricing#anthropic-api	https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py	2025-02-28
+anthropic/claude-3-7-sonnet-20250219	Claude 3.7 Sonnet		$3.00	$15.00	https://www.anthropic.com/pricing#anthropic-api	https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py	2025-02-28
+anthropic/claude-3-opus-20240229	Claude 3 Opus		$15.00	$75.00	https://www.anthropic.com/pricing#anthropic-api	https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/types/model.py	2025-02-28
+google/gemini-1.0-pro	Gemini 1.0 Pro		$0.50	$1.50	https://ai.google.dev/pricing	https://ai.google.dev/gemini-api/docs/models/gemini	2024-09-03
+google/gemini-1.5-pro	Gemini 1.5 Pro		$1.25	$5.00	https://ai.google.dev/pricing	https://ai.google.dev/gemini-api/docs/models/gemini	2025-02-28
+google/gemini-2.0-pro-exp-02-05	Gemini 2.0 Pro		$0.00	$0.00		https://ai.google.dev/gemini-api/docs/models/experimental-models	2025-02-28
+grok/grok-2-1212	Grok-2		$2.00	$10.00	https://docs.x.ai/docs/models?cluster=us-east-1	https://docs.x.ai/docs/models?cluster=us-east-1	2025-02-28
+mistral/mistral-large-2407	Mistral Large 2		$3.00	$9.00	https://mistral.ai/technology/#pricing	https://mistral.ai/technology/#pricing	2024-09-03
+mistral/open-mixtral-8x7b	Mixtral 8x7B		$0.70	$0.70	https://mistral.ai/technology/#pricing	https://mistral.ai/technology/#pricing	2024-09-03
+openai/gpt-3.5-turbo	GPT-3.5 Turbo		$0.50	$1.50	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-3.5-turbo-0125	GPT-3.5 Turbo		$0.50	$1.50	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4	GPT-4		$30.00	$60.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4-0613	GPT-4		$30.00	$60.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4-turbo	GPT-4 Turbo		$10.00	$30.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4-turbo-2024-04-09	GPT-4 Turbo		$10.00	$30.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4.5-preview-2025-02-27	GPT-4.5		$75.00	$150.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models#gpt-4-5	2025-02-28
+openai/gpt-4o	GPT-4o		$2.50	$10.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/gpt-4o-2024-08-06	GPT-4o		$2.50	$10.00	https://openai.com/api/pricing/	https://platform.openai.com/docs/models, https://openai.com/api/pricing/	2025-02-28
+openai/o1-2024-12-17	o1		$15.00	$60.00	https://platform.openai.com/docs/pricing		2025-02-28
+openai/o3-mini-2025-01-31	o3-mini		$1.10	$4.40	https://platform.openai.com/docs/pricing		2025-02-28
+together/deepseek-ai/DeepSeek-R1	DeepSeek-R1		$3.00	$7.00	https://www.together.ai/pricing		2025-02-28
+together/deepseek-ai/DeepSeek-V3	DeepSeek-V3	$1.25	$1.25	$1.25	https://www.together.ai/pricing		2025-02-28
+together/meta-llama/Llama-2-13b-chat-hf	Llama 2-13B	$0.22	$0.22	$0.22	https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	https://api.together.xyz/models/meta-llama/Llama-2-13b-chat-hf	2025-02-28
+together/meta-llama/Llama-3.3-70B-Instruct-Turbo	Llama 3.3	$0.88	$0.88	$0.88	https://api.together.xyz/models/meta-llama/Llama-3.3-70B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Llama-3.3-70B-Instruct-Turbo	2025-02-28
+together/meta-llama/Llama-3.3-70B-Instruct-Turbo-Free	Llama 3.3	$0.00	$0.00	$0.00	https://api.together.xyz/models/meta-llama/Llama-3.3-70B-Instruct-Turbo-Free	https://api.together.xyz/models/meta-llama/Llama-3.3-70B-Instruct-Turbo-Free	2025-02-28
+together/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	Llama 3-70B	$0.88	$0.88	$0.88	https://api.together.xyz/models/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Meta-Llama-3-70B-Instruct-Turbo	2025-02-28
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo	Llama 3.1-405B	$3.50	$3.50	$3.50	https://api.together.xyz/models/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo	https://api.together.xyz/models/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo	2025-02-28
+together/mistralai/Mistral-Small-24B-Instruct-2501	Mistral Small 3	$0.80	$0.80	$0.80	https://api.together.xyz/models/mistralai/Mistral-Small-24B-Instruct-2501	https://api.together.xyz/models/mistralai/Mistral-Small-24B-Instruct-2501	2025-02-28

@@ -8,10 +8,10 @@ create_code_summary.py
 files_to_include.txt
 **/__pycache__/
 notes.md
-trendlines-blogpost/logs/
+blogpost/logs/
 vct_data/
-trendlines-preprint/backups/
-trendlines-preprint/logs/
-trendlines-preprint/logs_for_sharing/
+preprint/backups/
+preprint/logs/
+preprint/logs_for_sharing/
 *.png
 *.csv

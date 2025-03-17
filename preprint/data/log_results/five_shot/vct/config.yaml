@@ -1,0 +1,16 @@
+environment:
+  INSPECT_LOG_DIR: ./trendlines-preprint/logs/five_shot/vct
+
+models:
+  anthropic/claude-3-5-sonnet-20241022: {}
+  together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo: {}
+  openai/gpt-4o-2024-08-06: {}
+  google/gemini-1.5-pro: {}
+
+benchmarks:
+  vct:
+    enabled: true
+    mode: mr
+    subtasks: "no_images"
+    n_shot: 5
+    runs: 10

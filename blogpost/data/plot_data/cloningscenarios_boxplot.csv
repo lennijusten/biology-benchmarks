@@ -1,0 +1,41 @@
+inspect_model_name,epoch_model_name,Organization,accuracy,stderr,cot
+openai/gpt-4o,GPT-4o,OpenAI,0.36363636363636365,0.08503766788122594,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.36363636363636365,0.08503766788122595,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.48484848484848486,0.08834775598250455,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.36363636363636365,0.08503766788122594,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.48484848484848486,0.08834775598250455,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.3939393939393939,0.0863769261438741,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.3333333333333333,0.08333333333333333,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.3333333333333333,0.08333333333333333,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.36363636363636365,0.08503766788122595,No CoT
+openai/gpt-4o,GPT-4o,OpenAI,0.21212121212121213,0.07226812131946558,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.30303030303030304,0.08124094920275461,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.36363636363636365,0.08503766788122594,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.36363636363636365,0.08503766788122595,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.30303030303030304,0.08124094920275461,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.30303030303030304,0.08124094920275461,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.24242424242424243,0.07575757575757576,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.36363636363636365,0.08503766788122595,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.30303030303030304,0.08124094920275461,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.45454545454545453,0.08802234877744129,No CoT
+google/gemini-1.5-pro,Gemini 1.5 Pro,Google DeepMind,0.5151515151515151,0.08834775598250455,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.6060606060606061,0.08637692614387409,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.3939393939393939,0.08637692614387409,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.3939393939393939,0.08637692614387409,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.45454545454545453,0.08802234877744129,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.45454545454545453,0.08802234877744129,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.36363636363636365,0.08503766788122595,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.45454545454545453,0.08802234877744129,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.5151515151515151,0.08834775598250455,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.48484848484848486,0.08834775598250455,No CoT
+anthropic/claude-3-5-sonnet-20240620,Claude 3.5 Sonnet,Anthropic,0.42424242424242425,0.08736789844447572,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.45454545454545453,0.08802234877744129,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.42424242424242425,0.08736789844447572,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.5151515151515151,0.08834775598250455,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.3333333333333333,0.08333333333333333,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.3333333333333333,0.08333333333333333,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.42424242424242425,0.08736789844447572,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.45454545454545453,0.08802234877744129,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.42424242424242425,0.08736789844447572,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.42424242424242425,0.08736789844447572,No CoT
+together/meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo,Llama 3.1-405B,Meta AI,0.36363636363636365,0.08503766788122595,No CoT
