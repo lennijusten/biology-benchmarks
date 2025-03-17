@@ -79,7 +79,7 @@ environment:
 
 models:
   openai/o3-mini-2025-01-31:
-    reasoning_effort: "high",
+    reasoning_effort: "high"
     temperature: 0.8
   anthropic/claude-3-7-sonnet-20250219:
     temperature: 0.0
