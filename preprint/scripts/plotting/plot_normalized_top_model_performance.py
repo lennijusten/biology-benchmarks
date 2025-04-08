@@ -26,98 +26,6 @@ def get_color_map(df: pd.DataFrame) -> Dict[str, str]:
     color_palette = sns.color_palette("deep", len(organizations))
     return dict(zip(organizations, color_palette))
 
-def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Dict[str, str], output_dir: Path):
-    """Plot top model performance trends for each benchmark."""
-    # Define benchmark name mapping
-    benchmark_names = {
-        'pubmedqa': 'PubMedQA',
-        'mmlu': 'MMLU-Bio',
-        'gpqa': 'GPQA-Bio',
-        'wmdp': 'WMDP-Bio',
-        'lab-bench-litqa2': 'LitQA2',
-        'lab-bench-cloningscenarios': 'CloningScenarios',
-        'lab-bench-protocolqa': 'ProtocolQA',
-        'vct': 'VCT-Text'
-    }
-    
-    # Set up the plot style
-    plt.rcParams['font.family'] = 'Arial'
-    plt.rcParams['font.size'] = 14
-    sns.set_style("whitegrid")
-    
-    # Create figure
-    fig, ax = plt.subplots(figsize=(12, 8), dpi=300)
-    
-    # Filter for zero-shot data
-    dfz = df[df['prompt_schema'] == "zero_shot"]
-    publication_dates = sorted(dfz['epoch_model_publication_date'].unique())
-    
-    # Plot data for each benchmark
-    for bench in benchmarks:
-        df_bench = dfz[dfz['benchmark'] == bench]
-        top_performers = []
-        
-        for step in publication_dates:
-            models_at_step = df_bench[df_bench['epoch_model_publication_date'] <= step]
-            if not models_at_step.empty:
-                top_performer = models_at_step.nlargest(1, 'mean_accuracy').iloc[0]
-                top_performers.append(top_performer)
-        
-        if top_performers:
-            # Add final entry with last performance extending to latest date
-            last_performer = top_performers[-1].copy()
-            last_performer['epoch_model_publication_date'] = publication_dates[-1]
-            top_performers.append(last_performer)
-            bench_data = pd.DataFrame(top_performers)
-            
-            # Plot step function
-            line = ax.step(bench_data['epoch_model_publication_date'], 
-                         bench_data['mean_accuracy'], 
-                         label=benchmark_names.get(bench, bench),
-                         where='post',
-                         linewidth=2,
-                         alpha=0.4)
-            
-            # Add dots in same color as line, excluding the artificially added last point
-            line_color = line[0].get_color()
-            for _, row in bench_data[:-1].iterrows():  # Exclude the last row which was added for line extension
-                ax.scatter(row['epoch_model_publication_date'],
-                         row['mean_accuracy'],
-                         color=line_color,
-                         s=50,
-                         zorder=5,
-                         alpha=0.8)
-    
-    # Customize plot
-    ax.set_xlabel("Model Publication Date", fontsize=14)
-    ax.set_ylabel("Accuracy", fontsize=14)
-    ax.set_title("Top Model Performance Over Time by Benchmark", fontsize=16, pad=20)
-    
-    # Format x-axis
-    ax.xaxis.set_major_locator(mdates.YearLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-    ax.xaxis.set_minor_locator(mdates.MonthLocator())
-    
-    # Add grid and customize appearance
-    ax.grid(True, linestyle='--', alpha=0.7)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    
-    # Create legend
-    legend = ax.legend(title="Benchmarks", 
-                      loc='center left', 
-                      bbox_to_anchor=(1, 0.5),
-                      fontsize=14)
-    legend.get_frame().set_alpha(1)
-    plt.setp(legend.get_title(), fontsize=14, fontweight='bold')
-    
-    # Adjust layout and save
-    plt.tight_layout()
-    plt.savefig(output_dir / 'benchmark_trends.png', 
-                dpi=300, 
-                bbox_inches='tight')
-    plt.close()
-
 def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], output_dir: Path):
     """Plot normalized benchmark performance trends over time, similar to the Epoch AI figure."""
     
@@ -140,10 +48,18 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
         'mmlu': 0.50,      # Placeholder for initial performance from 2021
     }
     
-    # Set up the plot style
+    # Set up the plot style - use consistent color palette
     plt.rcParams['font.family'] = 'Arial'
     plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
+    
+    # Create consistent color mapping based on original order
+    original_benchmark_order = [
+        'pubmedqa', 'mmlu', 'gpqa', 'wmdp', 'lab-bench-litqa2',
+        'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct'
+    ]
+    color_palette = sns.color_palette("deep", len(original_benchmark_order))
+    color_map = {bench: color_palette[i] for i, bench in enumerate(original_benchmark_order)}
     
     # Create figure
     fig, ax = plt.subplots(figsize=(12, 8), dpi=300)
@@ -154,6 +70,10 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
     # For x-axis with benchmark publication dates
     benchmark_pub_dates = {}
     all_dates = []
+    included_benchmarks = []  # Track which benchmarks are actually included
+    
+    # For tracking LAB-Bench components (to combine under one label)
+    lab_bench_components = ['lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa']
     
     # Plot data for each benchmark
     for bench in benchmarks:
@@ -168,7 +88,6 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
         
         # Skip if no expert baseline or publication date available
         if expert_baseline is None or pd.isna(bench_pub_date):
-            print(f"Skipping {bench} - missing expert baseline or publication date")
             continue
         
         benchmark_pub_dates[bench] = bench_pub_date
@@ -190,7 +109,6 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
             # For newer benchmarks, use the first model after publication
             relevant_models = df_bench[df_bench['epoch_model_publication_date'] >= bench_pub_date]
             if relevant_models.empty:
-                print(f"Skipping {bench} - no models available after benchmark publication")
                 continue
                 
             # Get initial model (the one closest to benchmark publication)
@@ -199,13 +117,7 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
         
         # Skip if initial performance already exceeds expert performance
         if initial_performance >= expert_baseline:
-            print(f"Skipping {bench} - initial model performance ({initial_performance:.2f}) already exceeds expert baseline ({expert_baseline:.2f})")
             continue
-        
-        # Print debug information for each benchmark
-        print(f"Benchmark: {bench}")
-        print(f"  Initial performance: {initial_performance:.4f}")
-        print(f"  Expert baseline: {expert_baseline:.4f}")
         
         # Get and sort model publication dates for this benchmark
         model_dates = sorted(df_bench['epoch_model_publication_date'].unique())
@@ -265,21 +177,21 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
         if bench_data.empty:
             continue
             
-        # Print the first normalized point for debugging
-        print(f"  First normalized point: {bench_data['normalized_accuracy'].iloc[0]:.4f}")
-        
+        # Track included benchmarks
+        included_benchmarks.append(bench)
+            
         # Plot using a regular line instead of step
         line = ax.plot(bench_data['date'], 
                      bench_data['normalized_accuracy'], 
                      label=benchmark_names.get(bench, bench),
+                     color=color_map[bench],
                      linewidth=2.5,
                      alpha=0.7)
         
         # Add dots at data points
-        line_color = line[0].get_color()
         ax.scatter(bench_data['date'],
                  bench_data['normalized_accuracy'],
-                 color=line_color,
+                 color=color_map[bench],
                  s=70,
                  zorder=5,
                  alpha=0.8)
@@ -290,13 +202,32 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
     # Add horizontal line at initial performance level
     ax.axhline(y=-100, color='black', linestyle=':', linewidth=1.5, alpha=0.7, label='Initial model performance')
     
+    # Add benchmark publication dates as text labels under x-axis
+    # Group LAB-Bench components under one label
+    lab_bench_date = None
+    for bench in included_benchmarks:
+        if bench in lab_bench_components:
+            if lab_bench_date is None:
+                lab_bench_date = benchmark_pub_dates[bench]
+                # Add a single "LAB-Bench" label for all components
+                ax.text(lab_bench_date, ax.get_ylim()[0] - 5, 
+                        "LAB-Bench", 
+                        ha='center', va='top', 
+                        fontsize=10, rotation=0)
+        else:
+            # Add individual benchmark labels
+            ax.text(benchmark_pub_dates[bench], ax.get_ylim()[0] - 5, 
+                    benchmark_names.get(bench, bench), 
+                    ha='center', va='top', 
+                    fontsize=10, rotation=0)
+    
     # Customize plot
     ax.set_xlabel("Date", fontsize=14)
     ax.set_ylabel("Performance (normalized %)", fontsize=14)
     ax.set_title("LLM Performance on Biology Benchmarks Relative to Human Experts", fontsize=16, pad=20)
     
-    # Set y-axis limits
-    ax.set_ylim(-110, 50)  # Increased upper limit to accommodate GPQA performance
+    # Set y-axis limits with more room for GPQA
+    ax.set_ylim(-110, 60)  # Increased upper limit to 60 for GPQA
     
     # Format x-axis with a reasonable time range
     all_dates = sorted(all_dates)
@@ -337,8 +268,7 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
                 "Performance normalized with human expert level at 0% and initial model performance at -100%.",
                 fontsize=10, alpha=0.7)
     
-    # Adjust layout and save
-    plt.tight_layout()
+    # Save the plot
     plt.savefig(output_dir / 'normalized_benchmark_trends.png', 
                 dpi=300, 
                 bbox_inches='tight')
@@ -363,7 +293,7 @@ def main():
         'lab-bench-cloningscenarios', 'lab-bench-protocolqa', 'vct'
     ]
     
-    # Generate normalized plot only
+    # Generate normalized plot
     plot_normalized_benchmark_trends(df, benchmarks, args.output)
 
 if __name__ == '__main__':
