@@ -44,8 +44,8 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
     # Initial performance values for older benchmarks (to be replaced with actual values later)
     # These are just placeholders for benchmarks published before your earliest model
     initial_performance_values = {
-        'pubmedqa': 0.60,  # Placeholder for initial performance from 2019
-        'mmlu': 0.50,      # Placeholder for initial performance from 2021
+        'pubmedqa': 0.681,  # From the paper: " Our best performing model, multi-phase fine-tuning of BioBERT with long answer bag-of-word statistics as additional supervision, achieves 68.1% accuracy, compared to single human performance of 78.0% accuracy"
+        'mmlu': 0.440,      # Placeholder for initial performance from 2021
     }
     
     # Set up the plot style - use consistent color palette
@@ -74,6 +74,9 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
     
     # For tracking LAB-Bench components (to combine under one label)
     lab_bench_components = ['lab-bench-litqa2', 'lab-bench-cloningscenarios', 'lab-bench-protocolqa']
+    
+    # Track first data points for each benchmark (for label placement)
+    first_data_points = {}
     
     # Plot data for each benchmark
     for bench in benchmarks:
@@ -134,6 +137,9 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
             'model': 'Initial',
             'raw_accuracy': initial_performance
         })
+        
+        # Store first data point for this benchmark
+        first_data_points[bench] = bench_pub_date
         
         # For each date point, only record if there's an improvement
         for date in sorted(model_dates):
@@ -202,24 +208,24 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
     # Add horizontal line at initial performance level
     ax.axhline(y=-100, color='black', linestyle=':', linewidth=1.5, alpha=0.7, label='Initial model performance')
     
-    # Add benchmark publication dates as text labels under x-axis
-    # Group LAB-Bench components under one label
-    lab_bench_date = None
+   # Add benchmark names at first data points directly above x-axis line
+    lab_bench_labeled = False
+
     for bench in included_benchmarks:
-        if bench in lab_bench_components:
-            if lab_bench_date is None:
-                lab_bench_date = benchmark_pub_dates[bench]
-                # Add a single "LAB-Bench" label for all components
-                ax.text(lab_bench_date, ax.get_ylim()[0] - 5, 
-                        "LAB-Bench", 
+        if bench in first_data_points:
+            if bench in lab_bench_components:
+                # Group all LAB-Bench components under a single label
+                if not lab_bench_labeled:
+                    ax.text(first_data_points[bench], -105, 'LAB-Bench',
                         ha='center', va='top', 
-                        fontsize=10, rotation=0)
-        else:
-            # Add individual benchmark labels
-            ax.text(benchmark_pub_dates[bench], ax.get_ylim()[0] - 5, 
-                    benchmark_names.get(bench, bench), 
+                        fontsize=12, color='black')  # Changed to black
+                    lab_bench_labeled = True
+            else:
+                # Add benchmark name directly under the first point
+                ax.text(first_data_points[bench], -105, 
+                    benchmark_names.get(bench, bench),
                     ha='center', va='top', 
-                    fontsize=10, rotation=0)
+                    fontsize=12, color='black')  # Changed to black
     
     # Customize plot
     ax.set_xlabel("Date", fontsize=14)
@@ -262,12 +268,7 @@ def plot_normalized_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], ou
                       fontsize=12)
     legend.get_frame().set_alpha(1)
     plt.setp(legend.get_title(), fontsize=14, fontweight='bold')
-    
-    # Add annotation explaining the normalization
-    plt.figtext(0.01, 0.01, 
-                "Performance normalized with human expert level at 0% and initial model performance at -100%.",
-                fontsize=10, alpha=0.7)
-    
+        
     # Save the plot
     plt.savefig(output_dir / 'normalized_benchmark_trends.png', 
                 dpi=300, 
