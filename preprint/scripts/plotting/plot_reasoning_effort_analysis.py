@@ -383,8 +383,8 @@ def create_multi_benchmark_plot(all_data, output_file, csv_output=None):
         
         # Map benchmark names to their display names
         benchmark_display = {
-            "vct": "VCT",
-            "gpqa": "GPQA",
+            "vct": "VCT-Text",
+            "gpqa": "GPQA-Bio",
             "lab-bench-cloningscenarios": "CloningScenarios",
             "lab-bench-protocolqa": "ProtocolQA"
         }
