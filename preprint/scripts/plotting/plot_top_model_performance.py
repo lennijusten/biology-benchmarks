@@ -29,14 +29,14 @@ def get_color_map(df: pd.DataFrame) -> Dict[str, str]:
 def plot_benchmark_trends(df: pd.DataFrame, benchmarks: List[str], color_map: Dict[str, str], output_dir: Path):
     # Define benchmark name mapping
     benchmark_names = {
-        'vct': 'VCT',
-        'mmlu': 'MMLU',
-        'gpqa': 'GPQA',
+        'pubmedqa': 'PubMedQA',
+        'mmlu': 'MMLU-Bio',
+        'gpqa': 'GPQA-Bio',
+        'wmdp': 'WMDP-Bio',
+        'lab-bench-litqa2': 'LitQA2',
         'lab-bench-cloningscenarios': 'CloningScenarios',
         'lab-bench-protocolqa': 'ProtocolQA',
-        'lab-bench-litqa2': 'LitQA2',
-        'wmdp': 'WMDP',
-        'pubmedqa': 'PubMedQA'
+        'vct': 'VCT-Text'
     }
     """Plot top model performance trends for each benchmark."""
     
