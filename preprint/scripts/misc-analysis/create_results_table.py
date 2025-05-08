@@ -28,13 +28,13 @@ def transform_benchmark_data(input_file, output_file):
     
     # Define benchmark mapping (input CSV names to output column names)
     benchmark_mapping = {
-        'vct': 'VCT',
-        'mmlu': 'MMLU',
-        'gpqa': 'GPQA',
+        'vct': 'VCT-Text',
+        'mmlu': 'MMLU-Bio',
+        'gpqa': 'GPQA-Bio',
         'lab-bench-cloningscenarios': 'CloningScenarios',
         'lab-bench-protocolqa': 'ProtocolQA',
         'lab-bench-litqa2': 'LitQA2',
-        'wmdp': 'WMDP',
+        'wmdp': 'WMDP-Bio',
         'pubmedqa': 'PubMedQA'
     }
     
@@ -42,7 +42,7 @@ def transform_benchmark_data(input_file, output_file):
     df_zero_shot['benchmark_display'] = df_zero_shot['benchmark'].map(benchmark_mapping)
     
     # List of all benchmarks we want in the final output
-    benchmarks = ['PubMedQA', 'MMLU', 'GPQA', 'WMDP', 'LitQA2', 'CloningScenarios', 'ProtocolQA', 'VCT']
+    benchmarks = ['PubMedQA', 'MMLU-Bio', 'GPQA-Bio', 'WMDP-Bio', 'LitQA2', 'CloningScenarios', 'ProtocolQA', 'VCT-Text']
     
     # Create pivot tables for mean and std values using the mapped benchmark names
     mean_pivot = pd.pivot_table(
