@@ -75,7 +75,7 @@ def get_benchmark_publication_date():
         'lab-bench-litqa2': '2024-07-14',
         'lab-bench-cloningscenarios': '2024-07-14',
         'lab-bench-protocolqa': '2024-07-14',
-        'vct': '',
+        'vct': '2025-04-21',
     }
     return publication_dates
 
@@ -273,13 +273,13 @@ def main():
     parser.add_argument('logs_dir', type=Path, help='Path to logs directory')
     parser.add_argument('--cost', action='store_true', help='Add cost data to results')
     parser.add_argument('--output', type=Path, help='Output dir for final CSVs')
-    parser.add_argument('--models-data', type=str, default='./trendlines-preprint/data/models/models_data.tsv',
+    parser.add_argument('--models-data', type=str, default='./preprint/data/models/models_data.tsv',
                        help='Path to models data TSV file')
     parser.add_argument('--large-scale', type=str, 
-                       default='./trendlines-preprint/data/models/epoch_large_scale_ai_models.csv',
+                       default='./preprint/data/models/epoch_large_scale_ai_models.csv',
                        help='Path to large scale models CSV file')
     parser.add_argument('--notable', type=str,
-                       default='./trendlines-preprint/data/models/epoch_notable_ai_models.csv',
+                       default='./preprint/data/models/epoch_notable_ai_models.csv',
                        help='Path to notable models CSV file')
     args = parser.parse_args()
     
