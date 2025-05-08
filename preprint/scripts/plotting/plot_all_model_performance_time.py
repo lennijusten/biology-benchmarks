@@ -161,14 +161,14 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     """Create a multi-panel figure with all benchmarks."""
     # Define benchmark names and display names
     benchmarks = {
-        'mmlu': 'MMLU',
-        'gpqa': 'GPQA',
-        'wmdp': 'WMDP',
+        'pubmedqa': 'PubMedQA',
+        'mmlu': 'MMLU-Bio',
+        'gpqa': 'GPQA-Bio',
+        'wmdp': 'WMDP-Bio',
         'lab-bench-litqa2': 'LitQA2',
         'lab-bench-cloningscenarios': 'CloningScenarios',
         'lab-bench-protocolqa': 'ProtocolQA',
-        'pubmedqa': 'PubMedQA',
-        'vct': 'VCT'
+        'vct': 'VCT-Text'
     }
     
     # Set up the plot style
@@ -176,7 +176,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     plt.rcParams['font.size'] = 14
     sns.set_style("whitegrid")
     
-    # Create color map for organizations - ordered alphabetically
+    # Create color map for organizations
     organizations = sorted(df['epoch_organization'].unique())
     color_palette = sns.color_palette("deep", len(organizations))
     color_map = dict(zip(organizations, color_palette))
@@ -209,7 +209,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     for org in sorted(organizations):
         legend_ax.plot([], [], marker='o', linestyle='', color=color_map[org], label=org, markersize=10)
         
-    # Baseline lines - explicitly add all types
+    # Baseline lines
     legend_ax.plot([], [], color='#092327', linestyle='--', label='Expert accuracy', linewidth=1.5)
     legend_ax.plot([], [], color='#0b5351', linestyle='-.', label='Non-expert accuracy', linewidth=1.5)
     legend_ax.plot([], [], color='#00a9a5', linestyle=':', label='Random guess', linewidth=1.5)
@@ -233,7 +233,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     )
     
     # Add overall title
-    fig.suptitle('Model Performance Across Biology Benchmarks', fontsize=16, fontweight='bold', y=0.98)
+    fig.suptitle('Model Performance Across Biology Benchmarks', fontsize=16, fontweight='bold', y=0.99)
     
     # Adjust layout and save
     plt.tight_layout(rect=[0, 0.1, 1, 0.95])
