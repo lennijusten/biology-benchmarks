@@ -153,14 +153,14 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
     """Create a multi-panel figure with all benchmarks."""
     # Define benchmark names and display names
     benchmarks = {
-        'mmlu': 'MMLU',
-        'gpqa': 'GPQA',
-        'wmdp': 'WMDP',
+        'mmlu': 'MMLU-Bio',
+        'gpqa': 'GPQA-Bio',
+        'wmdp': 'WMDP-Bio',
         'lab-bench-litqa2': 'LitQA2',
         'lab-bench-cloningscenarios': 'CloningScenarios',
         'lab-bench-protocolqa': 'ProtocolQA',
         'pubmedqa': 'PubMedQA',
-        'vct': 'VCT'
+        'vct': 'VCT-Text'
     }
     
     # Set up the plot style
@@ -186,7 +186,7 @@ def create_multi_panel_plot(df: pd.DataFrame, output_file: str):
         
         # Only add x-axis label to bottom row
         if row == 1:
-            ax.set_xlabel('Training Compute (FLOPs)', labelpad=10)
+            ax.set_xlabel('Training Compute (FLOP)', labelpad=10)
         
         # Only add y-axis label to leftmost panels
         if col == 0:
