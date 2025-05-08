@@ -7,8 +7,8 @@ if [ $# -ne 1 ]; then
 fi
 
 PROMPT_SCHEMA=$1
-BASE_DIR="$(pwd)/trendlines-preprint/logs_for_sharing/$PROMPT_SCHEMA"
-PYTHON_SCRIPT="$(pwd)/trendlines-preprint/scripts/generate_result_csv_from_log_dir.py"
+BASE_DIR="$(pwd)/preprint/logs_for_sharing/$PROMPT_SCHEMA"
+PYTHON_SCRIPT="$(pwd)/preprint/scripts/prepare-data/generate_result_csv_from_log_dir.py"
 
 if [ ! -d "$BASE_DIR" ]; then
     echo "Error: Directory $BASE_DIR does not exist"
