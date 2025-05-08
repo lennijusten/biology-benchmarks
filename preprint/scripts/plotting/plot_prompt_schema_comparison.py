@@ -51,13 +51,13 @@ def main(input_csv, output_file, csv_output=None):
     
     # Benchmark display names
     benchmark_mapping = {
-        'vct': 'VCT',
-        'mmlu': 'MMLU',
-        'gpqa': 'GPQA',
+        'vct': 'VCT-Text',
+        'mmlu': 'MMLU-Bio',
+        'gpqa': 'GPQA-Bio',
         'lab-bench-cloningscenarios': 'CloningScenarios',
         'lab-bench-protocolqa': 'ProtocolQA',
         'lab-bench-litqa2': 'LitQA2',
-        'wmdp': 'WMDP',
+        'wmdp': 'WMDP-Bio',
         'pubmedqa': 'PubMedQA'
     }
     df['benchmark_display'] = df['benchmark'].map(benchmark_mapping)
