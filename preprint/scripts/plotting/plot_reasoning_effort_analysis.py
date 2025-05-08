@@ -116,8 +116,8 @@ def plot_single_benchmark(ax, claude_data, o3_data, benchmark_name, sample_count
     
     # Map from benchmark name to display name
     benchmark_display = {
-        "vct": "VCT",
-        "gpqa": "GPQA",
+        "vct": "VCT-Text",
+        "gpqa": "GPQA-Bio",
         "lab-bench-cloningscenarios": "CloningScenarios",
         "lab-bench-protocolqa": "ProtocolQA"
     }
