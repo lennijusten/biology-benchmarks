@@ -46,21 +46,6 @@ source venv/bin/activate
 ```
 pip install -r requirements.txt
 ```
-## Core Functionality
-
-This suite allows you to:
-
-1. Run multiple LLMs against biology benchmarks.
-2. Configure benchmarks and models via YAML files.
-3. Easily extend the suite with new benchmarks and models.
-
-The main components are:
-
-- `main.py`: The entry point for running evaluations.
-- `benchmarks/`: Contains benchmark implementations (e.g., GPQA).
-- `configs/`: YAML configuration files for specifying evaluation parameters.
-- `rag/`: Contains RAG implementations and tools (Incomplete).
-- `solvers/`: Contains solver implementations, including the chain-of-thought solver.
 
 ## Usage
 
@@ -101,11 +86,3 @@ benchmarks:
 * `environment`: Set environment variables for Inspect.
 * `models`: Specify models to evaluate and their settings. 
 * `benchmarks`: Configure which benchmarks to run and their parameters.
-
-
-## Extending the Suite
-To add a new benchmark:
-
-1. Create a new class in `benchmarks/` inheriting from `Benchmark`.
-2. Implement the `run` method and define the `schema` using `BenchmarkSchema`.
-3. Add the benchmark to the benchmarks dictionary in `main.py`.
