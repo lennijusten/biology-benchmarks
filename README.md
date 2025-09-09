@@ -18,7 +18,7 @@ The repository is organized as follows:
 * `solvers/`: Custom solver implementations (e.g., few-shot)
 * `utils/:` Utility functions and prompt templates
 * `blogpost/`: Data, figures, and analysis scripts from an Oct 2024 [blog post](https://www.lennijusten.com/blog/biology-benchmarks/)
-* `preprint/`: Updated data, figures, and analysis scripts for the forthcoming preprint
+* `preprint/`: Updated data, figures, and analysis scripts for May 2025 [preprint](https://arxiv.org/abs/2505.06108)
 
 ## Benchmark Structure
 
